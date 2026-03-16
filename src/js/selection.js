@@ -1,179 +1,77 @@
-import * as fct from "/src/js/fonctions.js";
-
-/***********************************************************************/
-/** VARIABLES GLOBALES 
-/***********************************************************************/
-
-var player; // désigne le sprite du joueur
-var clavier; // pour la gestion du clavier
-var groupe_plateformes;
-
-// définition de la classe "selection"
-export default class selection extends Phaser.Scene {
-  constructor() {
-    super({ key: "selection" }); // mettre le meme nom que le nom de la classe
-  }
-
-  /***********************************************************************/
-  /** FONCTION PRELOAD 
-/***********************************************************************/
-
-  /** La fonction preload est appelée une et une seule fois,
-   * lors du chargement de la scene dans le jeu.
-   * On y trouve surtout le chargement des assets (images, son ..)
-   */
-  preload() {
-    // tous les assets du jeu sont placés dans le sous-répertoire src/assets/
-    this.load.image("img_ciel", "src/assets/sky.png");
-    this.load.image("img_plateforme", "src/assets/platform.png");
-    this.load.spritesheet("img_perso", "src/assets/dude.png", {
-      frameWidth: 32,
-      frameHeight: 48
-    });
-    this.load.image("img_porte1", "src/assets/door1.png");
-    this.load.image("img_porte2", "src/assets/door2.png");
-    this.load.image("img_porte3", "src/assets/door3.png");
-  }
-
-  /***********************************************************************/
-  /** FONCTION CREATE 
-/***********************************************************************/
-
-  /* La fonction create est appelée lors du lancement de la scene
-   * si on relance la scene, elle sera appelée a nouveau
-   * on y trouve toutes les instructions permettant de créer la scene
-   * placement des peronnages, des sprites, des platesformes, création des animations
-   * ainsi que toutes les instructions permettant de planifier des evenements
-   */
-  create() {
-      fct.doNothing();
-      fct.doAlsoNothing();
-
-    /*************************************
-     *  CREATION DU MONDE + PLATEFORMES  *
-     *************************************/
-
-    // On ajoute une simple image de fond, le ciel, au centre de la zone affichée (400, 300)
-    // Par défaut le point d'ancrage d'une image est le centre de cette derniere
-    this.add.image(400, 300, "img_ciel");
-
-    // la création d'un groupes permet de gérer simultanément les éléments d'une meme famille
-    //  Le groupe groupe_plateformes contiendra le sol et deux platesformes sur lesquelles sauter
-    // notez le mot clé "staticGroup" : le static indique que ces élements sont fixes : pas de gravite,
-    // ni de possibilité de les pousser.
-    groupe_plateformes = this.physics.add.staticGroup();
-    // une fois le groupe créé, on va créer les platesformes , le sol, et les ajouter au groupe groupe_plateformes
-
-    // l'image img_plateforme fait 400x32. On en met 2 à coté pour faire le sol
-    // la méthode create permet de créer et d'ajouter automatiquement des objets à un groupe
-    // on précise 2 parametres : chaque coordonnées et la texture de l'objet, et "voila!"
-    groupe_plateformes.create(200, 584, "img_plateforme");
-    groupe_plateformes.create(600, 584, "img_plateforme");
-
-    //  on ajoute 3 platesformes flottantes
-    groupe_plateformes.create(600, 450, "img_plateforme");
-    groupe_plateformes.create(50, 300, "img_plateforme");
-    groupe_plateformes.create(750, 270, "img_plateforme");
-
-    /****************************
-     *  Ajout des portes   *
-     ****************************/
-    this.porte1 = this.physics.add.staticSprite(600, 414, "img_porte1");
-    this.porte2 = this.physics.add.staticSprite(50, 264, "img_porte2");
-    this.porte3 = this.physics.add.staticSprite(750, 234, "img_porte3");
-
-    /****************************
-     *  CREATION DU PERSONNAGE  *
-     ****************************/
-
-    // On créée un nouveeau personnage : player
-    player = this.physics.add.sprite(100, 450, "img_perso");
-
-    //  propriétées physiqyes de l'objet player :
-    player.setBounce(0.2); // on donne un petit coefficient de rebond
-    player.setCollideWorldBounds(true); // le player se cognera contre les bords du monde
-
-    /***************************
-     *  CREATION DES ANIMATIONS *
-     ****************************/
-    // dans cette partie, on crée les animations, à partir des spritesheet
-    // chaque animation est une succession de frame à vitesse de défilement défini
-    // une animation doit avoir un nom. Quand on voudra la jouer sur un sprite, on utilisera la méthode play()
-    // creation de l'animation "anim_tourne_gauche" qui sera jouée sur le player lorsque ce dernier tourne à gauche
-    this.anims.create({
-      key: "anim_tourne_gauche", // key est le nom de l'animation : doit etre unique poru la scene.
-      frames: this.anims.generateFrameNumbers("img_perso", {
-        start: 0,
-        end: 3
-      }), // on prend toutes les frames de img perso numerotées de 0 à 3
-      frameRate: 10, // vitesse de défilement des frames
-      repeat: -1 // nombre de répétitions de l'animation. -1 = infini
-    });
-
-    // creation de l'animation "anim_tourne_face" qui sera jouée sur le player lorsque ce dernier n'avance pas.
-    this.anims.create({
-      key: "anim_face",
-      frames: [{ key: "img_perso", frame: 4 }],
-      frameRate: 20
-    });
-
-    // creation de l'animation "anim_tourne_droite" qui sera jouée sur le player lorsque ce dernier tourne à droite
-    this.anims.create({
-      key: "anim_tourne_droite",
-      frames: this.anims.generateFrameNumbers("img_perso", {
-        start: 5,
-        end: 8
-      }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    /***********************
-     *  CREATION DU CLAVIER *
-     ************************/
-    // ceci permet de creer un clavier et de mapper des touches, connaitre l'état des touches
-    clavier = this.input.keyboard.createCursorKeys();
-
-    /*****************************************************
-     *  GESTION DES INTERATIONS ENTRE  GROUPES ET ELEMENTS *
-     ******************************************************/
-
-    //  Collide the player and the groupe_etoiles with the groupe_plateformes
-    this.physics.add.collider(player, groupe_plateformes);
-  }
-
-  /***********************************************************************/
-  /** FONCTION UPDATE 
-/***********************************************************************/
-
-  update() {
-    
-    if (clavier.left.isDown) {
-      player.setVelocityX(-160);
-      player.anims.play("anim_tourne_gauche", true);
-    } else if (clavier.right.isDown) {
-      player.setVelocityX(160);
-      player.anims.play("anim_tourne_droite", true);
-    } else {
-      player.setVelocityX(0);
-      player.anims.play("anim_face");
+export default class menu extends Phaser.Scene {
+    constructor() {
+        super({ key: "menu" });
     }
 
-    if (clavier.up.isDown && player.body.touching.down) {
-      player.setVelocityY(-330);
+    preload() {
+        // Chargement des images (vérifie bien les noms de tes fichiers dans assets)
+        this.load.image("menu_fond", "src/assets/sky.png");
+        this.load.image("imageBoutonPlay", "src/assets/button_play.png");
     }
 
-    if (Phaser.Input.Keyboard.JustDown(clavier.space) == true) {
-      if (this.physics.overlap(player, this.porte1))
-        this.scene.switch("niveau1");
-      if (this.physics.overlap(player, this.porte2))
-        this.scene.switch("niveau2");
-      if (this.physics.overlap(player, this.porte3))
-        this.scene.switch("niveau3");
+    create() {
+        // --- 1. LE FOND ---
+        // On met le ciel en fond, légèrement agrandi pour éviter les bords blancs
+        this.add.image(400, 300, "menu_fond").setScale(1.2);
+
+        // --- 2. LE TITRE ---
+        // Un gros titre blanc avec un contour noir pour le style "MultiMap"
+        let titre = this.add.text(400, 250, "MULTIMAP", {
+            fontFamily: 'Arial Black',
+            fontSize: "70pt",
+            fill: "#ffffff",
+            stroke: "#000000",
+            strokeThickness: 12
+        }).setOrigin(0.5);
+
+        // --- 3. LE BOUTON PLAY ---
+        // On place le bouton au centre, un peu plus bas
+        this.bouton_play = this.add.image(400, 450, "imageBoutonPlay");
+        this.bouton_play.setScale(0.6);
+        this.bouton_play.setInteractive({ useHandCursor: true });
+
+        // --- 4. ANIMATIONS (Le côté "Jolie") ---
+        
+        // Animation du titre : il monte et descend doucement
+        this.tweens.add({
+            targets: titre,
+            y: 230,
+            duration: 2000,
+            yoyo: true,
+            loop: -1,
+            ease: 'Sine.easeInOut'
+        });
+
+        // Animation du bouton : il "respire" (grossit et rétrécit)
+        this.tweens.add({
+            targets: this.bouton_play,
+            scale: 0.65,
+            duration: 1000,
+            yoyo: true,
+            loop: -1,
+            ease: 'Back.easeInOut'
+        });
+
+        // --- 5. INTERACTIONS ---
+
+        // Quand la souris passe dessus
+        this.bouton_play.on("pointerover", () => {
+            this.bouton_play.setTint(0x00ffff); // Devient bleu cyan
+        });
+
+        // Quand la souris part
+        this.bouton_play.on("pointerout", () => {
+            this.bouton_play.clearTint();
+        });
+
+        // Quand on clique : ON VA À LA PIECE 2
+        this.bouton_play.on("pointerup", () => {
+            // Petit effet de caméra pour le punch
+            this.cameras.main.fadeOut(500, 0, 0, 0);
+            
+            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                this.scene.start("piece2"); 
+            });
+        });
     }
-  }
 }
-
-/***********************************************************************/
-/** CONFIGURATION GLOBALE DU JEU ET LANCEMENT 
-/***********************************************************************/

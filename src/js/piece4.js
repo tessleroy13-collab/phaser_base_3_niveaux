@@ -10,55 +10,57 @@ export default class piece4 extends Phaser.Scene {
 
   preload() {
     // tous les assets du jeu sont placés dans le sous-répertoire src/assets/
-    this.load.image("img_ciel", "src/assets/sky.png");
-    this.load.image("img_plateforme", "src/assets/platform.png");
-    this.load.spritesheet("img_perso", "src/assets/dude.png", {
-      frameWidth: 173,
-      frameHeight: 228
-    });
+    
+    
 
     // chargement de l'image balle.png
     this.load.image("bullet", "src/assets/balle.png");
     // chargement de l'image cible.png
-    this.load.image("cible", "src/assets/cible.png");
+    this.load.image("img_ennemi", "src/assets/cible.png");
+
+    this.load.tilemapTiledJSON("map", "src/assets/map.json");
+
+    this.load.image("fond", "src/assets/tileset/fond.png");
+    this.load.image("deco", "src/assets/tileset/deco.png");
+
+    this.load.spritesheet("img_perso", "src/assets/dude.png", {
+      frameWidth: 173,
+      frameHeight: 228
+    });
   }
 
   create() {
 
+    const carte = this.make.tilemap({ key: "map" });
 
+    // 1. Chargement des jeux de tuiles
+    // On utilise "claque_plateformes" car c'est le nom écrit dans ton onglet Tiled
+    const tileset_fond = carte.addTilesetImage("fond", "fond");
+    const tileset_plateformes = carte.addTilesetImage("claque_plateformes", "deco");
+
+    // 2. Création des calques
+    // L'ordre est important : le fond en premier pour qu'il soit derrière
+    const calque_fond = carte.createLayer("Calque_de_Tuiles2", tileset_fond);
+    calque_plateformes = carte.createLayer("calque_plateformes", tileset_plateformes);
+
+    // 3. Activation des collisions
+    calque_plateformes.setCollisionByProperty({ estSolide: true });
     /*************************************
    *  CREATION DU MONDE + PLATEFORMES  *
    *************************************/
-
-    // On ajoute une simple image de fond, le ciel, au centre de la zone affichée (400, 300)
-    // Par défaut le point d'ancrage d'une image est le centre de cette derniere
-    this.add.image(400, 300, "img_ciel");
-
-    // la création d'un groupes permet de gérer simultanément les éléments d'une meme famille
-    //  Le groupe groupe_plateformes contiendra le sol et deux platesformes sur lesquelles sauter
-    // notez le mot clé "staticGroup" : le static indique que ces élements sont fixes : pas de gravite,
-    // ni de possibilité de les pousser.
-    groupe_plateformes = this.physics.add.staticGroup();
-    // une fois le groupe créé, on va créer les platesformes , le sol, et les ajouter au groupe groupe_plateformes
-
-    // l'image img_plateforme fait 400x32. On en met 2 à coté pour faire le sol
-    // la méthode create permet de créer et d'ajouter automatiquement des objets à un groupe
-    // on précise 2 parametres : chaque coordonnées et la texture de l'objet, et "voila!"
-    groupe_plateformes.create(200, 584, "img_plateforme");
-    groupe_plateformes.create(600, 584, "img_plateforme");
-
-    //  on ajoute 3 platesformes flottantes
-    groupe_plateformes.create(600, 450, "img_plateforme");
-    groupe_plateformes.create(50, 300, "img_plateforme");
-    groupe_plateformes.create(750, 270, "img_plateforme");
 
     /****************************
      *  CREATION DU PERSONNAGE  *
      ****************************/
 
     // On créée un nouveeau personnage : player
-    player = this.physics.add.sprite(100, 450, "img_perso");
+    player = this.physics.add.sprite(60, 100, "img_perso");
     player.setScale(0.2);
+
+    player.body.setSize(60, 210); // Ajuste ces chiffres pour que le rectangle rose colle au corps de Bob
+    player.body.setOffset(55, 10); // Pour centrer le rectangle sur le dessin
+
+    player.setGravityY(150);
 
 
     //  propriétées physiqyes de l'objet player :
@@ -102,9 +104,8 @@ export default class piece4 extends Phaser.Scene {
     /*****************************************************
      *  GESTION DES INTERATIONS ENTRE  GROUPES ET ELEMENTS *
      ******************************************************/
+    this.physics.add.collider(player, calque_plateformes);
 
-    //  Collide the player and the groupe_etoiles with the groupe_plateformes
-    this.physics.add.collider(player, groupe_plateformes);
     player.direction = 'right';
     // création du clavier - code déja présent sur le jeu de départ
     cursors = this.input.keyboard.createCursorKeys();
@@ -115,6 +116,7 @@ export default class piece4 extends Phaser.Scene {
     groupeBullets = this.physics.add.group();
 
     cibles = this.physics.add.group();
+    this.physics.add.collider(cibles, calque_plateformes);
 
     ajouterCible(600, 420);
     ajouterCible(50, 270);
@@ -123,9 +125,6 @@ export default class piece4 extends Phaser.Scene {
 
     this.physics.add.overlap(groupeBullets, cibles, hit, null, this);
 
-
-    // ajout du modèle de collision entre cibles et plate-formes
-    this.physics.add.collider(cibles, groupe_plateformes);
 
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
 
@@ -139,6 +138,38 @@ export default class piece4 extends Phaser.Scene {
         objet.destroy();
       }
     });
+
+  groupe_ennemis = this.physics.add.group();
+
+  // extraction des poitns depuis le calque calque_ennemis, stockage dans tab_points
+  const tab_points = carte.getObjectLayer("calque_ennemis");   
+
+  // on fait une boucle foreach, qui parcours chaque élements du tableau tab_points  
+  tab_points.objects.forEach(point => {
+    if (point.name == "ennemi") {
+      var nouvel_ennemi = this.physics.add.sprite(point.x, point.y, "img_ennemi");
+      groupe_ennemis.add(nouvel_ennemi);
+    }
+}); 
+
+  // par défaut, on va a gauche en utilisant la meme animation que le personnage
+  groupe_ennemis.children.iterate(function iterateur(un_ennemi) {
+    un_ennemi.setVelocityX(-40);
+    un_ennemi.direction = "gauche";
+    un_ennemi.play("anim_tourne_gauche", true);
+  }); 
+
+  this.physics.add.collider(groupe_ennemis, calque_plateformes);
+  this.physics.add.collider(player, calque_plateformes);
+
+  // On définit les limites du monde physique (la taille de ta carte Tiled)
+this.physics.world.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
+
+// On demande à la caméra de suivre le joueur
+this.cameras.main.startFollow(player, true, 0.08, 0.08);
+
+// On limite la caméra aux bords de la carte pour ne pas voir le vide noir
+this.cameras.main.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
   }
 
   update() {
@@ -164,15 +195,45 @@ export default class piece4 extends Phaser.Scene {
   }
 }
 
-    if (clavier.up.isDown && player.body.touching.down) {
-      player.setVelocityY(-330);
-    }
-
+   if (clavier.up.isDown && (player.body.onFloor() || player.body.touching.down)) {
+    // -250 pour sauter moins haut, mais avec l'impression de flotter
+    player.setVelocityY(-250); 
+}
     // déclenchement de la fonction tirer() si appui sur boutonFeu 
     if (Phaser.Input.Keyboard.JustDown(boutonFeu)) {
       tirer(player);
     }
+
+    groupe_ennemis.children.iterate(function iterateur(un_ennemi) {
+    if (un_ennemi.direction == "gauche" && un_ennemi.body.blocked.down) {
+      var coords = un_ennemi.getBottomLeft();
+      var tuileSuivante = calque_plateformes.getTileAtWorldXY(
+        coords.x,
+        coords.y + 10
+      );
+      if (tuileSuivante == null || un_ennemi.body.blocked.left) {
+        // on risque de marcher dans le vide, on tourne
+        un_ennemi.direction = "droite";
+        un_ennemi.setVelocityX(40);
+        un_ennemi.play("anim_tourne_droite", true);
+      }
+    } else if (un_ennemi.direction == "droite" && un_ennemi.body.blocked.down) {
+      var coords = un_ennemi.getBottomRight();
+      var tuileSuivante = calque_plateformes.getTileAtWorldXY(
+        coords.x,
+        coords.y + 10
+      );
+      if (tuileSuivante == null || un_ennemi.body.blocked.right) {
+        // on risque de marcher dans le vide, on tourne
+        un_ennemi.direction = "gauche";
+        un_ennemi.setVelocityX(-40);
+        un_ennemi.play("anim_tourne_gauche", true);
+      }
+    }
+  });
   }
+
+ 
 }
 
 /***********************************************************************/
@@ -190,6 +251,8 @@ var cursors;
 var cibles;
 var score = 0;
 var scoreText;
+var calque_plateformes;
+var groupe_ennemis;
 
 
 //fonction tirer( ), prenant comme paramètre l'auteur du tir

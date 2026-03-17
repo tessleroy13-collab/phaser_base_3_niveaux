@@ -1,4 +1,12 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"json",
+         "target":"..\/FondBOB.json"
+        }
+    },
  "height":20,
  "infinite":false,
  "layers":[
@@ -107,15 +115,75 @@
                 }, 
                 {
                  "height":0,
-                 "id":17,
-                 "name":"",
+                 "id":23,
+                 "name":"patrick",
                  "point":true,
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":1773.33333333333,
-                 "y":200
+                 "x":724,
+                 "y":464
+                }, 
+                {
+                 "height":0,
+                 "id":25,
+                 "name":"patrick",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2132,
+                 "y":448
+                }, 
+                {
+                 "height":0,
+                 "id":29,
+                 "name":"patrick",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2426,
+                 "y":114
+                }, 
+                {
+                 "height":0,
+                 "id":30,
+                 "name":"patrick",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2710,
+                 "y":170
+                }, 
+                {
+                 "height":0,
+                 "id":31,
+                 "name":"patrick",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2102,
+                 "y":128
+                }, 
+                {
+                 "height":0,
+                 "id":32,
+                 "name":"patrick",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1756,
+                 "y":420
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -124,7 +192,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":21,
+ "nextobjectid":33,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -133,7 +201,7 @@
         {
          "columns":99,
          "firstgid":1,
-         "image":"tileset\/FD bob FINAL.png",
+         "image":"FD bob FINAL.png",
          "imageheight":640,
          "imagewidth":3177,
          "margin":0,
@@ -147,7 +215,7 @@
         {
          "columns":3,
          "firstgid":1981,
-         "image":"tileset\/pierre1.png",
+         "image":"pierre1.png",
          "imageheight":321,
          "imagewidth":121,
          "margin":0,
@@ -432,7 +500,7 @@
         {
          "columns":3,
          "firstgid":2011,
-         "image":"tileset\/pierre2.png",
+         "image":"pierre2.png",
          "imageheight":321,
          "imagewidth":121,
          "margin":0,

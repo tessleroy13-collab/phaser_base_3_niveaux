@@ -1,27 +1,13 @@
-import * as fct from "/src/js/fonctions.js";
-
-/***********************************************************************/
-/** VARIABLES GLOBALES 
-/***********************************************************************/
-
-var player; // désigne le sprite du joueur
-var clavier; // pour la gestion du clavier
-var groupe_plateformes;
-
-// définition de la classe "selection"
-export default class selection extends Phaser.Scene {
+export default class piece4 extends Phaser.Scene {
+  // constructeur de la classe
   constructor() {
-    super({ key: "selection" }); // mettre le meme nom que le nom de la classe
+    super({
+      key: "piece4" //  ici on précise le nom de la classe en tant qu'identifiant
+    });
   }
 
-  /***********************************************************************/
-  /** FONCTION PRELOAD 
-/***********************************************************************/
 
-  /** La fonction preload est appelée une et une seule fois,
-   * lors du chargement de la scene dans le jeu.
-   * On y trouve surtout le chargement des assets (images, son ..)
-   */
+
   preload() {
     // tous les assets du jeu sont placés dans le sous-répertoire src/assets/
     this.load.image("img_ciel", "src/assets/sky.png");
@@ -30,28 +16,19 @@ export default class selection extends Phaser.Scene {
       frameWidth: 212,
       frameHeight: 287
     });
-    this.load.image("img_porte1", "src/assets/door1.png");
-    this.load.image("img_porte2", "src/assets/door2.png");
-    this.load.image("img_porte3", "src/assets/door3.png");
+
+    // chargement de l'image balle.png
+    this.load.image("bullet", "src/assets/balle.png");
+    // chargement de l'image cible.png
+    this.load.image("cible", "src/assets/cible.png");
   }
 
-  /***********************************************************************/
-  /** FONCTION CREATE 
-/***********************************************************************/
-
-  /* La fonction create est appelée lors du lancement de la scene
-   * si on relance la scene, elle sera appelée a nouveau
-   * on y trouve toutes les instructions permettant de créer la scene
-   * placement des peronnages, des sprites, des platesformes, création des animations
-   * ainsi que toutes les instructions permettant de planifier des evenements
-   */
   create() {
-      fct.doNothing();
-      fct.doAlsoNothing();
+
 
     /*************************************
-     *  CREATION DU MONDE + PLATEFORMES  *
-     *************************************/
+   *  CREATION DU MONDE + PLATEFORMES  *
+   *************************************/
 
     // On ajoute une simple image de fond, le ciel, au centre de la zone affichée (400, 300)
     // Par défaut le point d'ancrage d'une image est le centre de cette derniere
@@ -76,19 +53,13 @@ export default class selection extends Phaser.Scene {
     groupe_plateformes.create(750, 270, "img_plateforme");
 
     /****************************
-     *  Ajout des portes   *
-     ****************************/
-    this.porte1 = this.physics.add.staticSprite(600, 414, "img_porte1");
-    this.porte2 = this.physics.add.staticSprite(50, 264, "img_porte2");
-    this.porte3 = this.physics.add.staticSprite(750, 234, "img_porte3");
-
-    /****************************
      *  CREATION DU PERSONNAGE  *
      ****************************/
 
     // On créée un nouveeau personnage : player
     player = this.physics.add.sprite(100, 450, "img_perso");
     player.setScale(0.2);
+
 
     //  propriétées physiqyes de l'objet player :
     player.setBounce(0.2); // on donne un petit coefficient de rebond
@@ -103,10 +74,7 @@ export default class selection extends Phaser.Scene {
     // creation de l'animation "anim_tourne_gauche" qui sera jouée sur le player lorsque ce dernier tourne à gauche
     this.anims.create({
       key: "anim_tourne_gauche", // key est le nom de l'animation : doit etre unique poru la scene.
-      frames: this.anims.generateFrameNumbers("img_perso", {
-        start: 5,
-        end: 8
-      }), // on prend toutes les frames de img perso numerotées de 0 à 3
+      frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }), // on prend toutes les frames de img perso numerotées de 0 à 3
       frameRate: 10, // vitesse de défilement des frames
       repeat: -1 // nombre de répétitions de l'animation. -1 = infini
     });
@@ -121,10 +89,7 @@ export default class selection extends Phaser.Scene {
     // creation de l'animation "anim_tourne_droite" qui sera jouée sur le player lorsque ce dernier tourne à droite
     this.anims.create({
       key: "anim_tourne_droite",
-      frames: this.anims.generateFrameNumbers("img_perso", {
-        start: 0,
-        end: 3
-      }),
+      frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
       frameRate: 10,
       repeat: -1
     });
@@ -141,18 +106,47 @@ export default class selection extends Phaser.Scene {
 
     //  Collide the player and the groupe_etoiles with the groupe_plateformes
     this.physics.add.collider(player, groupe_plateformes);
+    player.direction = 'right';
+    // création du clavier - code déja présent sur le jeu de départ
+    cursors = this.input.keyboard.createCursorKeys();
+
+    // affectation de la touche A à boutonFeu
+    boutonFeu = this.input.keyboard.addKey('A');
+    // création d'un groupe d'éléments vide
+    groupeBullets = this.physics.add.group();
+
+    cibles = this.physics.add.group();
+    var cible1 = cibles.create(600, 420, "cible");
+    var cible2 = cibles.create(50, 270, "cible");
+    var cible3 = cibles.create(750, 240, "cible");
+    var cible4 = cibles.create(200, 550, "cible");
+
+
+    cibles.children.iterate(function (cibleTrouvee) {
+      cibleTrouvee.setScale(0.2);   // taille des cibles
+      cibleTrouvee.pointsVie = Phaser.Math.Between(1, 5);
+    });
+
+    ajouterCible(600, 420);
+    ajouterCible(50, 270);
+    ajouterCible(750, 240);
+
+    this.physics.add.overlap(groupeBullets, cibles, hit, null, this);
+
+
+    // ajout du modèle de collision entre cibles et plate-formes
+    this.physics.add.collider(cibles, groupe_plateformes);
+
+    scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
   }
 
-  /***********************************************************************/
-  /** FONCTION UPDATE 
-/***********************************************************************/
-
   update() {
-    
     if (clavier.left.isDown) {
+      player.direction = 'left';
       player.setVelocityX(-160);
       player.anims.play("anim_tourne_gauche", true);
     } else if (clavier.right.isDown) {
+      player.direction = 'right';
       player.setVelocityX(160);
       player.anims.play("anim_tourne_droite", true);
     } else {
@@ -164,17 +158,75 @@ export default class selection extends Phaser.Scene {
       player.setVelocityY(-330);
     }
 
-    if (Phaser.Input.Keyboard.JustDown(clavier.space) == true) {
-      if (this.physics.overlap(player, this.porte1))
-        this.scene.switch("niveau1");
-      if (this.physics.overlap(player, this.porte2))
-        this.scene.switch("piece4");
-      if (this.physics.overlap(player, this.porte3))
-        this.scene.switch("niveau3");
+    // déclenchement de la fonction tirer() si appui sur boutonFeu 
+    if (Phaser.Input.Keyboard.JustDown(boutonFeu)) {
+      tirer(player);
     }
+
+
+    // instructions pour les objets surveillés en bord de monde
+    this.physics.world.on("worldbounds", function (body) {
+      // on récupère l'objet surveillé
+      var objet = body.gameObject;
+      // s'il s'agit d'une balle
+      if (groupeBullets.contains(objet)) {
+        // on le détruit
+        objet.destroy();
+      }
+    });
   }
 }
 
 /***********************************************************************/
-/** CONFIGURATION GLOBALE DU JEU ET LANCEMENT 
+/** VARIABLES GLOBALES 
 /***********************************************************************/
+var player; // désigne le sprite du joueur
+var groupe_plateformes; // contient toutes les plateformes
+var clavier; // pour la gestion du clavier
+var boutonFeu;
+// mise en place d'une variable groupeBullets
+var groupeBullets;
+// mise en place d'une variable groupeCibles
+var groupeCibles;
+var cursors;
+var cibles;
+var score = 0;
+var scoreText;
+
+
+//fonction tirer( ), prenant comme paramètre l'auteur du tir
+function tirer(player) {
+  var coefDir;
+  if (player.direction == 'left') { coefDir = -1; } else { coefDir = 1 }
+  // on crée la balle a coté du joueur
+  var bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
+  // parametres physiques de la balle.
+  bullet.setCollideWorldBounds(true);
+  // on acive la détection de l'evenement "collision au bornes"
+  bullet.body.onWorldBounds = true;
+  bullet.body.allowGravity = false;
+  bullet.setVelocity(1000 * coefDir, 0); // vitesse en x et en y
+  bullet.setScale(0.1);
+  bullet.body.setSize(bullet.width * 0.5, bullet.height * 0.5);
+}
+
+// fonction déclenchée lorsque uneBalle et uneCible se superposent
+function hit(bullet, cible) {
+  cible.pointsVie--;
+  if (cible.pointsVie == 0) {
+    cible.destroy();
+  }
+  bullet.destroy();
+
+  score += 10;
+  scoreText.setText('Score: ' + score);
+}
+
+
+function ajouterCible(x, y) {
+  var cible = cibles.create(x, y, "cible");
+  cible.setScale(0.2);
+  cible.pointsVie = 3;
+}
+
+

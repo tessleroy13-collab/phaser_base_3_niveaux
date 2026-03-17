@@ -9,16 +9,16 @@ export default class piece1 extends Phaser.Scene {
     this.load.image("img_ciel", "src/assets/sky.png");
 
     this.load.spritesheet("img_bob", "src/assets/bob.png", {
-      frameWidth: 140,
-      frameHeight: 188
+      frameWidth: 173,
+      frameHeight: 228
     });
   }
 
   create() {
     this.add.image(400, 300, "img_ciel");
 
-    player = this.physics.add.sprite(350, 450, "img_bob");
-    player.setDisplaySize(64, 64);
+    player = this.physics.add.sprite(1000, 450, "img_bob");
+    player.setDisplaySize(40, 40);
 
     //player.setFrame(0);
     player.setCollideWorldBounds(true);
@@ -31,7 +31,7 @@ export default class piece1 extends Phaser.Scene {
 
     this.anims.create({
       key: 'left',
-      frames: this.anims.generateFrameNumbers('img_bob', { start: 0, end: 3 }), // Ajuste les chiffres selon ton spritesheet
+      frames: this.anims.generateFrameNumbers('img_bob', { start: 1, end: 3 }), // Ajuste les chiffres selon ton spritesheet
       frameRate: 10,
       repeat: -1
     });
@@ -46,7 +46,7 @@ export default class piece1 extends Phaser.Scene {
     // Animation pour aller à droite
     this.anims.create({
       key: 'right',
-      frames: this.anims.generateFrameNumbers('img_bob', { start: 5, end: 8 }), // Ajuste les chiffres selon ton spritesheet
+      frames: this.anims.generateFrameNumbers('img_bob', { start: 6, end: 8 }), // Ajuste les chiffres selon ton spritesheet
       frameRate: 10,
       repeat: -1
     });

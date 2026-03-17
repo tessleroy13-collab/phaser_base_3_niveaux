@@ -1,12 +1,17 @@
 export default class piece1 extends Phaser.Scene {
-  // constructeur de la classe
   constructor() {
-    super({
-      key: "piece1" //  ici on précise le nom de la classe en tant qu'identifiant
-    });
+    super({ key: "piece1" });
   }
+
   preload() {
-    this.load.image("img_ciel", "src/assets/sky.png");
+    this.load.image("img_dab", "src/assets/tilesets/dab.png");
+    this.load.image("img_fond1", "src/assets/tilesets/fond1.png");
+    this.load.image("img_plateauxbois", "src/assets/tilesets/plateauxbois.png");
+    
+    // CORRECTION ICI : On charge l'image de la plateforme normalement
+    this.load.image("img_plateaux", "src/assets/plateau.png");
+
+    this.load.tilemapTiledJSON("carte", "src/assets/map.tmj");
 
     this.load.spritesheet("img_bob", "src/assets/bob.png", {
       frameWidth: 173,
@@ -15,88 +20,103 @@ export default class piece1 extends Phaser.Scene {
   }
 
   create() {
-    this.add.image(400, 300, "img_ciel");
+    const carteDuNiveau = this.add.tilemap("carte");
 
-    player = this.physics.add.sprite(1000, 450, "img_bob");
+    const tileset_dab = carteDuNiveau.addTilesetImage("dab", "img_dab");
+    const tileset_fond = carteDuNiveau.addTilesetImage("fond1", "img_fond1");
+    const tileset_bois = carteDuNiveau.addTilesetImage("plateauxbois", "img_plateauxbois");
+
+    const tousLesTilesets = [tileset_dab, tileset_fond, tileset_bois];
+
+    const background1 = carteDuNiveau.createLayer("Calque de Tuiles 4", tousLesTilesets);
+    const background2 = carteDuNiveau.createLayer("calque_background_2", tousLesTilesets);
+    const plateformesLayer = carteDuNiveau.createLayer("tuiles_de_jeu", tousLesTilesets);
+
+    if (background1) background1.setDepth(-10);
+    if (background2) background2.setDepth(-5);
+
+    if (plateformesLayer) {
+      plateformesLayer.setCollisionByProperty({ estSolide: true });
+    }
+
+    player = this.physics.add.sprite(100, 100, "img_bob");
     player.setDisplaySize(40, 40);
-
-    //player.setFrame(0);
     player.setCollideWorldBounds(true);
-    player.setBounce(0.2);
-    groupe_plateformes = this.physics.add.staticGroup();
-    this.physics.add.collider(player, groupe_plateformes);
+    player.setBounce(0.1);
+    player.setDepth(10);
 
+    this.physics.add.collider(player, plateformesLayer);
     clavier = this.input.keyboard.createCursorKeys();
 
-
+    // --- ANIMATIONS ---
     this.anims.create({
       key: 'left',
-      frames: this.anims.generateFrameNumbers('img_bob', { start: 1, end: 3 }), // Ajuste les chiffres selon ton spritesheet
-      frameRate: 10,
-      repeat: -1
+      frames: this.anims.generateFrameNumbers('img_bob', { start: 1, end: 3 }),
+      frameRate: 10, repeat: -1
     });
-
-    // Animation quand il ne bouge pas (face caméra)
     this.anims.create({
       key: 'turn',
-      frames: [{ key: 'img_bob', frame: 4 }], // Frame d'arrêt
+      frames: [{ key: 'img_bob', frame: 4 }],
       frameRate: 20
     });
-
-    // Animation pour aller à droite
     this.anims.create({
       key: 'right',
-      frames: this.anims.generateFrameNumbers('img_bob', { start: 6, end: 8 }), // Ajuste les chiffres selon ton spritesheet
-      frameRate: 10,
-      repeat: -1
+      frames: this.anims.generateFrameNumbers('img_bob', { start: 6, end: 8 }),
+      frameRate: 10, repeat: -1
     });
+
+    // --- PLATEFORME MOBILE ---
+    const pointDepart = carteDuNiveau.findObject("Calque d'Objets 1", obj => obj.name === "departPlateforme");
+
+    if (pointDepart) {
+        // On assigne à la variable globale déclarée en bas
+        plateformeMobile = this.physics.add.image(pointDepart.x, pointDepart.y, "img_plateaux");
+        plateformeMobile.setImmovable(true);
+        plateformeMobile.body.allowGravity = false;
+
+        this.tweens.add({
+          targets: plateformeMobile,
+          x: plateformeMobile.x + 200,
+          duration: 2000,
+          ease: 'Power1',
+          yoyo: true,
+          repeat: -1
+        });
+
+        this.physics.add.collider(player, plateformeMobile);
+    }
+
+    this.cameras.main.setBounds(0, 0, carteDuNiveau.widthInPixels, carteDuNiveau.heightInPixels);
+    this.cameras.main.startFollow(player);
+    this.physics.world.setBounds(0, 0, carteDuNiveau.widthInPixels, carteDuNiveau.heightInPixels);
   }
 
   update() {
-    //  LOGIQUE DE DÉPLACEMENT 
+    if (!clavier || !player) return;
 
     if (clavier.left.isDown) {
-      player.setVelocityX(-160); // Vitesse vers la gauche
-      player.anims.play('left', true); // Joue l'anim gauche
-    }
-    else if (clavier.right.isDown) {
-      player.setVelocityX(160); // Vitesse vers la droite
-      player.anims.play('right', true); // Joue l'anim droite
-    }
-    else {
-      player.setVelocityX(0); // S'arrête si on ne touche à rien
-      player.anims.play('turn'); // Anim de face
+      player.setVelocityX(-160);
+      player.anims.play('left', true);
+    } else if (clavier.right.isDown) {
+      player.setVelocityX(160);
+      player.anims.play('right', true);
+    } else {
+      player.setVelocityX(0);
+      player.anims.play('turn');
     }
 
-    // Saut : si la touche "Haut" est pressée ET que le joueur touche le sol
-    if (clavier.up.isDown && player.body.touching.down) {
-      player.setVelocityY(-330);
-    }
-  }
-
-  update() {
-    if (clavier.left.isDown) {
-      player.setVelocityX(-160); // Vitesse vers la gauche
-      player.anims.play('left', true); // Joue l'anim gauche
-    }
-    else if (clavier.right.isDown) {
-      player.setVelocityX(160); // Vitesse vers la droite
-      player.anims.play('right', true); // Joue l'anim droite
-    }
-    else {
-      player.setVelocityX(0); // S'arrête si on ne touche à rien
-      player.anims.play('turn'); // Anim de face
+    if (clavier.up.isDown && player.body.blocked.down) {
+      player.setVelocityY(-200);
     }
 
-    // Saut : si la touche "Haut" est pressée ET que le joueur touche le sol
-    if (clavier.up.isDown && player.body.touching.down) {
-      player.setVelocityY(-330);
+    // Effet pour que Bob suive la plateforme quand il est dessus
+    if (plateformeMobile && player.body.touching.down) {
+        player.x += plateformeMobile.body.deltaX();
     }
   }
 }
 
+// Variables globales
 var player;
-
-var groupe_plateformes;
-
-var clavier; 
+var clavier;
+var plateformeMobile; // On la déclare ici pour qu'elle soit utilisable dans update()

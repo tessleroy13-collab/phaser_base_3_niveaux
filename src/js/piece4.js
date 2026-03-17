@@ -62,7 +62,6 @@ export default class piece4 extends Phaser.Scene {
 
 
     //  propriétées physiqyes de l'objet player :
-    player.setBounce(0.2); // on donne un petit coefficient de rebond
     player.setCollideWorldBounds(true); // le player se cognera contre les bords du monde
 
     /***************************
@@ -116,20 +115,11 @@ export default class piece4 extends Phaser.Scene {
     groupeBullets = this.physics.add.group();
 
     cibles = this.physics.add.group();
-    var cible1 = cibles.create(600, 420, "cible");
-    var cible2 = cibles.create(50, 270, "cible");
-    var cible3 = cibles.create(750, 240, "cible");
-    var cible4 = cibles.create(200, 550, "cible");
-
-
-    cibles.children.iterate(function (cibleTrouvee) {
-      cibleTrouvee.setScale(0.2);   // taille des cibles
-      cibleTrouvee.pointsVie = Phaser.Math.Between(1, 5);
-    });
 
     ajouterCible(600, 420);
     ajouterCible(50, 270);
     ajouterCible(750, 240);
+    ajouterCible(200, 520);
 
     this.physics.add.overlap(groupeBullets, cibles, hit, null, this);
 
@@ -138,31 +128,6 @@ export default class piece4 extends Phaser.Scene {
     this.physics.add.collider(cibles, groupe_plateformes);
 
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
-  }
-
-  update() {
-    if (clavier.left.isDown) {
-      player.direction = 'left';
-      player.setVelocityX(-160);
-      player.anims.play("anim_tourne_gauche", true);
-    } else if (clavier.right.isDown) {
-      player.direction = 'right';
-      player.setVelocityX(160);
-      player.anims.play("anim_tourne_droite", true);
-    } else {
-      player.setVelocityX(0);
-      player.anims.play("anim_face");
-    }
-
-    if (clavier.up.isDown && player.body.touching.down) {
-      player.setVelocityY(-330);
-    }
-
-    // déclenchement de la fonction tirer() si appui sur boutonFeu 
-    if (Phaser.Input.Keyboard.JustDown(boutonFeu)) {
-      tirer(player);
-    }
-
 
     // instructions pour les objets surveillés en bord de monde
     this.physics.world.on("worldbounds", function (body) {
@@ -174,6 +139,39 @@ export default class piece4 extends Phaser.Scene {
         objet.destroy();
       }
     });
+  }
+
+  update() {
+    if (clavier.left.isDown) {
+  player.direction = 'left';
+  player.setVelocityX(-160);
+  player.anims.play("anim_tourne_gauche", true);
+
+} else if (clavier.right.isDown) {
+  player.direction = 'right';
+  player.setVelocityX(160);
+  player.anims.play("anim_tourne_droite", true);
+
+} else {
+  player.setVelocityX(0);
+
+  if (player.direction === 'left') {
+    player.anims.stop();
+    player.setFrame(1); // frame fixe gauche
+  } else {
+    player.anims.stop();
+    player.setFrame(6); // frame fixe droite
+  }
+}
+
+    if (clavier.up.isDown && player.body.touching.down) {
+      player.setVelocityY(-330);
+    }
+
+    // déclenchement de la fonction tirer() si appui sur boutonFeu 
+    if (Phaser.Input.Keyboard.JustDown(boutonFeu)) {
+      tirer(player);
+    }
   }
 }
 
@@ -205,9 +203,10 @@ function tirer(player) {
   // on acive la détection de l'evenement "collision au bornes"
   bullet.body.onWorldBounds = true;
   bullet.body.allowGravity = false;
-  bullet.setVelocity(1000 * coefDir, 0); // vitesse en x et en y
-  bullet.setScale(0.1);
+  bullet.setVelocity(300 * coefDir, 0); // vitesse en x et en y
+  bullet.setScale(0.07);
   bullet.body.setSize(bullet.width * 0.5, bullet.height * 0.5);
+  player.setVelocityX(0);
 }
 
 // fonction déclenchée lorsque uneBalle et uneCible se superposent
@@ -225,8 +224,8 @@ function hit(bullet, cible) {
 
 function ajouterCible(x, y) {
   var cible = cibles.create(x, y, "cible");
-  cible.setScale(0.2);
-  cible.pointsVie = 3;
+  cible.setScale(0.1);
+  cible.pointsVie = 1;
 }
 
 

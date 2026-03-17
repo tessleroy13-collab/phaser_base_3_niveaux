@@ -7,11 +7,10 @@ export default class piece2 extends Phaser.Scene {
         this.patrickAttrapes = 0;
         this.victoire = false;
         this.estMort = false; 
-        this.bobScale = 0.3;
+        this.bobScale = 0.3; // Taille de départ
     }
 
     preload() {
-        // --- CHARGEMENT DES ASSETS ---
         this.load.spritesheet("bob", "src/assets/bob.png", { frameWidth: 282, frameHeight: 416 });
         this.load.image("patrick", "src/assets/patrick.png");
         this.load.image("pierre1", "src/assets/tileset/pierre1.png");
@@ -21,26 +20,24 @@ export default class piece2 extends Phaser.Scene {
     }
 
     create() {
-        // 1. FOND (TileSprite)
+        // 1. FOND
         this.fondRoule = this.add.tileSprite(400, 300, 800, 600, "FondBOB_image").setDepth(-1);
 
         // 2. JOUEUR (BOB)
         this.player = this.physics.add.sprite(150, 300, "bob");
         
-        // Animation
         if (!this.anims.exists("bob_vol")) {
             this.anims.create({
                 key: "bob_vol",
                 frames: this.anims.generateFrameNumbers("bob", { start: 0, end: 8 }),
-                frameRate: 10,
-                repeat: -1
+                frameRate: 10, repeat: -1
             });
         }
         
         this.player.play("bob_vol");
         this.player.setScale(this.bobScale);
         this.player.body.setSize(160, 260, true); 
-        this.player.setCollideWorldBounds(false); // Permet de tomber hors de l'écran
+        this.player.setCollideWorldBounds(false); 
         this.player.body.allowGravity = false;
         this.player.setDepth(5);
 
@@ -48,7 +45,7 @@ export default class piece2 extends Phaser.Scene {
         this.obstacles = this.physics.add.group();
         this.bonus = this.physics.add.group();
 
-        // 4. CHARGEMENT DEPUIS TILED (patrick)
+        // 4. CHARGEMENT TILED (Optionnel si tu en as mis sur la carte)
         const carteDuNiveau = this.make.tilemap({ key: "carte" });
         const calqueObjets = carteDuNiveau.getObjectLayer("Calque d'Objets 1");
         if (calqueObjets) {
@@ -62,18 +59,18 @@ export default class piece2 extends Phaser.Scene {
             });
         }
 
-        // 5. INTERFACE (Score)
-        this.scoreText = this.add.text(16, 16, 'Patricks: 0/10', { 
+        // 5. INTERFACE
+        this.scoreText = this.add.text(16, 16, 'Patricks: 0/6', { 
             fontSize: '24px', fill: '#fff', stroke: '#000', strokeThickness: 3 
         }).setDepth(10).setScrollFactor(0);
 
         // 6. CONTRÔLES
         this.clavier = this.input.keyboard.createCursorKeys();
 
-        // 7. GÉNÉRATION DES PIERRES
+        // 7. GÉNÉRATION AUTOMATIQUE (Pierres + Patrick)
         this.timerPierres = this.time.addEvent({
             delay: 1500,
-            callback: this.spawnPierres,
+            callback: this.spawnObstacles,
             callbackScope: this,
             loop: true
         });
@@ -85,20 +82,19 @@ export default class piece2 extends Phaser.Scene {
             if (this.estMort) return;
             pat.destroy();
             this.patrickAttrapes++;
-            this.scoreText.setText('Patricks: ' + this.patrickAttrapes + '/10');
+            this.scoreText.setText('Patricks: ' + this.patrickAttrapes + '/6');
             
-            // Réduction de taille
-            if (this.bobScale > 0.15) {
-                this.bobScale -= 0.02;
+            // --- BOB RAPETISSIT ICI ---
+            if (this.bobScale > 0.12) { // Limite pour ne pas qu'il disparaisse
+                this.bobScale -= 0.03;
                 this.player.setScale(this.bobScale);
             }
             
-            if (this.patrickAttrapes >= 10) this.gagnerPartie();
+            if (this.patrickAttrapes >= 6) this.gagnerPartie();
         }, null, this);
     }
 
     update() {
-        // On bloque tout si Bob est mort ou a gagné
         if (this.estMort || this.victoire) {
             if (this.victoire) this.player.setVelocityX(400);
             return;
@@ -115,46 +111,47 @@ export default class piece2 extends Phaser.Scene {
         else if (this.clavier.down.isDown) this.player.setVelocityY(v);
         else this.player.setVelocityY(0);
 
-        // Nettoyage des objets hors écran
+        // Nettoyage des objets sortis de l'écran
         this.obstacles.children.each(obs => { if (obs && obs.x < -100) obs.destroy(); });
         this.bonus.children.each(pat => { if (pat && pat.x < -100) pat.destroy(); });
     }
 
-    mortDeBob() {
-        if (this.estMort || this.victoire) return;
-
-        this.estMort = true;
-        
-        // Arrêt des mouvements du décor et des objets
-        this.timerPierres.remove();
-        this.obstacles.setVelocityX(0);
-        this.bonus.setVelocityX(0);
-
-        // Effet de chute de Bob
-        this.player.setTint(0xff0000); // Bob devient rouge
-        this.player.stop(); // Arrête l'animation de vol
-        this.player.setVelocity(0, 500); // Bob tombe vers le bas
-        
-        // Pause de 2 secondes (2000 ms) avant de redémarrer
-        this.time.delayedCall(2000, () => {
-            this.scene.restart();
-        });
-    }
-
-    spawnPierres() {
+    spawnObstacles() {
         if (this.victoire || this.estMort) return;
         let py = Phaser.Math.Between(150, 450);
         let ecart = 260; 
 
+        // Création des pierres
         let h = this.obstacles.create(900, py - ecart, "pierre1");
-        h.setVelocityX(-350);
-        h.body.allowGravity = false;
-        h.body.setSize(h.width - 10, h.height - 10, true);
-
+        h.setVelocityX(-350); h.body.allowGravity = false;
+        
         let b = this.obstacles.create(900, py + ecart, "pierre2");
-        b.setVelocityX(-350);
-        b.body.allowGravity = false;
-        b.body.setSize(b.width - 10, b.height - 10, true);
+        b.setVelocityX(-350); b.body.allowGravity = false;
+
+        // --- APPARITION INFINIE DE PATRICK ---
+        // 40% de chance qu'un Patrick apparaisse entre les deux pierres
+        if (Phaser.Math.Between(0, 10) > 6) {
+            let p = this.bonus.create(1000, py, "patrick");
+            p.setScale(0.5);
+            p.body.allowGravity = false;
+            p.setVelocityX(-350); // Même vitesse que les pierres
+        }
+    }
+
+    mortDeBob() {
+        if (this.estMort || this.victoire) return;
+        this.estMort = true;
+        this.timerPierres.remove();
+        this.obstacles.setVelocityX(0);
+        this.bonus.setVelocityX(0);
+
+        this.player.setTint(0xff0000); 
+        this.player.stop(); 
+        this.player.setVelocity(0, 500); 
+        
+        this.time.delayedCall(2000, () => {
+            this.scene.restart();
+        });
     }
 
     gagnerPartie() {

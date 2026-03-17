@@ -13,8 +13,8 @@ export default class piece4 extends Phaser.Scene {
     this.load.image("img_ciel", "src/assets/sky.png");
     this.load.image("img_plateforme", "src/assets/platform.png");
     this.load.spritesheet("img_perso", "src/assets/dude.png", {
-      frameWidth: 212,
-      frameHeight: 287
+      frameWidth: 173,
+      frameHeight: 228
     });
 
     // chargement de l'image balle.png
@@ -74,7 +74,7 @@ export default class piece4 extends Phaser.Scene {
     // creation de l'animation "anim_tourne_gauche" qui sera jouée sur le player lorsque ce dernier tourne à gauche
     this.anims.create({
       key: "anim_tourne_gauche", // key est le nom de l'animation : doit etre unique poru la scene.
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }), // on prend toutes les frames de img perso numerotées de 0 à 3
+      frames: this.anims.generateFrameNumbers("img_perso", { start: 1, end: 3 }), // on prend toutes les frames de img perso numerotées de 0 à 3
       frameRate: 10, // vitesse de défilement des frames
       repeat: -1 // nombre de répétitions de l'animation. -1 = infini
     });
@@ -89,7 +89,7 @@ export default class piece4 extends Phaser.Scene {
     // creation de l'animation "anim_tourne_droite" qui sera jouée sur le player lorsque ce dernier tourne à droite
     this.anims.create({
       key: "anim_tourne_droite",
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }),
+      frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }),
       frameRate: 10,
       repeat: -1
     });

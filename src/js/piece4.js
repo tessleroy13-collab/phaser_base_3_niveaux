@@ -17,10 +17,11 @@ export default class piece4 extends Phaser.Scene {
       frameHeight: 228
     });
     this.load.image("img_porte", "src/assets/porte4.png");
+    this.load.image("img_portefin", "src/assets/portefin.png");
   }
 
   create() {
-    this.isRestarting = false; // Initialisation pour éviter l'écran blanc
+    this.isRestarting = false; 
     const carte = this.make.tilemap({ key: "map" });
     const tileset_fond = carte.addTilesetImage("fond", "fond");
     const tileset_plateformes = carte.addTilesetImage("claque_plateformes", "deco");
@@ -28,66 +29,42 @@ export default class piece4 extends Phaser.Scene {
     
     calque_plateformes = carte.createLayer("calque_plateformes", tileset_plateformes);
     calque_plateformes.setCollisionByProperty({ estSolide: true });
+  
+    // --- CORRECTION PORTE DÉBUT (Utilise le bon nom "img_porte") ---
+    this.porte_retour = this.physics.add.staticSprite(35, 100, "img_porte").setScale(0.4).refreshBody();
 
-    // Personnage
-    const porte = this.add.image(35, 100, "img_porte");
-    porte.setScale(0.4); // Ajuste la taille pour qu'elle corresponde à Bob
-
-    // 2. On crée Bob exactement aux mêmes coordonnées que la porte
+    // Personnage Bob
     player = this.physics.add.sprite(80, 100, "img_perso");
     player.setScale(0.2);
     player.body.setSize(60, 210);
     player.body.setOffset(55, 10);
     player.setGravityY(150);
     player.setCollideWorldBounds(true);
+    player.setDepth(10);
 
-    // Animations Bob
+    // --- (Tes animations Bob et Ennemis restent ici, ne change rien) ---
     if (!this.anims.exists("anim_tourne_gauche")) {
-    this.anims.create({
-      key: "anim_tourne_gauche",
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 1, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    });
+        this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 1, end: 3 }), frameRate: 10, repeat: -1 });
     }
     if (!this.anims.exists("anim_face")) {
-    this.anims.create({
-      key: "anim_face",
-      frames: [{ key: "img_perso", frame: 4 }],
-      frameRate: 20
-    });
+        this.anims.create({ key: "anim_face", frames: [{ key: "img_perso", frame: 4 }], frameRate: 20 });
     }
-
     if (!this.anims.exists("anim_tourne_droite")) {
-    this.anims.create({
-      key: "anim_tourne_droite",
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }),
-      frameRate: 10,
-      repeat: -1
-    });
+        this.anims.create({ key: "anim_tourne_droite", frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
     }
-
-    // Animations Ennemis
     if (!this.anims.exists("ennemi_gauche")) {
-    this.anims.create({
-      key: "ennemi_gauche",
-      frames: this.anims.generateFrameNumbers("img_ennemi", { start: 8, end: 10 }),
-      frameRate: 10,
-      repeat: -1
-    });
+        this.anims.create({ key: "ennemi_gauche", frames: this.anims.generateFrameNumbers("img_ennemi", { start: 8, end: 10 }), frameRate: 10, repeat: -1 });
     }
-
     if (!this.anims.exists("ennemi_droite")) {
-    this.anims.create({
-      key: "ennemi_droite",
-      frames: this.anims.generateFrameNumbers("img_ennemi", { start: 2, end: 4 }),
-      frameRate: 10,
-      repeat: -1
-    });
+        this.anims.create({ key: "ennemi_droite", frames: this.anims.generateFrameNumbers("img_ennemi", { start: 2, end: 4 }), frameRate: 10, repeat: -1 });
     }
 
     clavier = this.input.keyboard.createCursorKeys();
     boutonFeu = this.input.keyboard.addKey('A');
+
+    // --- CORRECTION PORTE FIN (On ne la crée qu'UNE SEULE FOIS ici) ---
+    this.porte_devant = this.physics.add.staticSprite(3155, 380, "img_portefin").setScale(0.6).refreshBody();
+
     groupeBullets = this.physics.add.group();
     groupe_ennemis = this.physics.add.group();
 
@@ -96,7 +73,7 @@ export default class piece4 extends Phaser.Scene {
       tab_points.objects.forEach(point => {
         if (point.name === "ennemi") {
           var un_ennemi = groupe_ennemis.create(point.x, point.y - 10, "img_ennemi");
-          un_ennemi.setScale(0.2); // Plus grand que Bob
+          un_ennemi.setScale(0.2);
           un_ennemi.pointsVie = 1;
           un_ennemi.setCollideWorldBounds(true);
           un_ennemi.direction = "gauche";
@@ -187,7 +164,15 @@ export default class piece4 extends Phaser.Scene {
             }
         }
     });
-
+  
+    if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
+        if (this.physics.overlap(player, this.porte_devant)) {
+            this.scene.start("fin"); 
+        }
+        if (this.physics.overlap(player, this.porte_retour)) {
+            this.scene.start("selection");
+        }
+    }
   }
 } // <--- FIN DE LA CLASSE PIECE4
 

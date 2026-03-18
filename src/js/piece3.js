@@ -1,4 +1,3 @@
-
 export default class piece3 extends Phaser.Scene {
   // constructeur de la classe
   constructor() {
@@ -6,7 +5,7 @@ export default class piece3 extends Phaser.Scene {
       key: "piece3" //  ici on précise le nom de la classe en tant qu'identifiant
     });
   }
-
+ 
   preload() {
     this.load.spritesheet("img_bobnage", "src/assets/bobnage.png", { 
       frameWidth: 146, 
@@ -14,7 +13,7 @@ export default class piece3 extends Phaser.Scene {
     });
     this.load.image("image_fond", "src/assets/tileset/fond.png");
     this.load.image("image_bob", "src/assets/tileset/tuiles_bob.png");
-    this.load.tilemapTiledJSON("carte", "src/assets/fond_bob.tmj");
+    this.load.tilemapTiledJSON("cartes", "src/assets/fond_bob.tmj");
     this.load.spritesheet("img_poisson", "src/assets/poisson.png", { 
       frameWidth: 316, 
       frameHeight: 216 
@@ -30,31 +29,31 @@ export default class piece3 extends Phaser.Scene {
     this.load.image("img_porte2bis", "src/assets/porte2bis.png");
     this.load.image("img_porte4", "src/assets/porte4.png");
   }
-
+ 
   create() {
-    const carteDuNiveau = this.add.tilemap("carte");
+    const carteDuNiveau = this.add.tilemap("cartes");
     const tileset_fond = carteDuNiveau.addTilesetImage("fond", "image_fond");
     const tileset_bob = carteDuNiveau.addTilesetImage("Sans titre (4) (1)", "image_bob");
-
+ 
     carteDuNiveau.createLayer("Calque de Tuiles 4", [tileset_fond, tileset_bob]);
     this.plateformes = carteDuNiveau.createLayer("calque_plateformes", [tileset_fond, tileset_bob]);
     carteDuNiveau.createLayer("calque_plantes", [tileset_fond, tileset_bob]);
     carteDuNiveau.createLayer("calque_coquillages", [tileset_fond, tileset_bob]);
-
+ 
     this.plateformes.setCollisionByProperty({ estSolide: true });
-
+ 
     this.player = this.physics.add.sprite(100, 300, "img_bobnage").setScale(0.6);
     this.player.setCollideWorldBounds(true);
     this.player.setDepth(10);
     this.player.body.setAllowGravity(false);
     this.physics.add.collider(this.player, this.plateformes);
-
+ 
     this.clavier = this.input.keyboard.createCursorKeys();
-
+ 
     this.physics.world.setBounds(0, 0, 3200, 640);
     this.cameras.main.setBounds(0, 0, 3200, 640);
     this.cameras.main.startFollow(this.player);
-
+ 
     this.anims.create({ 
       key: "nage_gauche", 
       frames: this.anims.generateFrameNumbers("img_bobnage", { 
@@ -108,26 +107,25 @@ export default class piece3 extends Phaser.Scene {
       frameRate: 10, 
       repeat: -1 
     });
-
+ 
     this.poissons = this.physics.add.group();
     this.tortues = this.physics.add.group();
     this.requins = this.physics.add.group();
-
+ 
     this.creerDepuisTiled(carteDuNiveau, "calque_poissons", this.poissons, "anim_poisson", 0.15, "img_poisson");
     this.creerDepuisTiled(carteDuNiveau, "calque_tortues", this.tortues, "anim_tortue", 1.8, "img_tortue");
     this.creerDepuisTiled(carteDuNiveau, "calque_requins", this.requins, "anim_requin", 0.5, "img_requin");
-
+ 
     this.porte_retour = this.physics.add.staticSprite(100, 300, "img_porte2bis").setScale(0.4).refreshBody();
     this.porte_devant = this.physics.add.staticSprite(3100, 500, "img_porte4").refreshBody();
-
+ 
     this.physics.add.overlap(this.player, this.poissons, this.attraperPoisson, null, this);
     this.physics.add.overlap(this.player, this.tortues, this.attraperTortue, null, this);
     this.physics.add.overlap(this.player, this.requins, this.toucherRequin, null, this);
-
-
+ 
     this.tempsRestant = 30;
     this.texteTimer = this.add.text(16, 16, 'Temps: 30', { fontSize: '32px', fill: '#fff', backgroundColor: '#000' }).setScrollFactor(0).setDepth(100);
-
+ 
     this.timerGlobal = this.time.addEvent({
       delay: 1000,
       callback: this.compteARebours,
@@ -135,14 +133,23 @@ export default class piece3 extends Phaser.Scene {
       loop: true,
       paused: true
     });
-
+ 
     this.jeuLance = false;
     this.vitesse = 120;
     this.offset = 0;
     this.afficherRegles();
+
+    this.textePorte = this.add.text(400, 500, "Appuyez sur ESPACE pour ouvrir", {
+    fontSize: '20px',
+    fill: '#fff',
+    backgroundColor: '#000000aa',
+    padding: { x: 10, y: 5 }
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(100);
+
+
+    this.textePorte.setVisible(false);
   }
-
-
+ 
   creerDepuisTiled(carte, nomCalque, groupe, animation, echelle, image) {
     const calqueObjets = carte.getObjectLayer(nomCalque);
     if (calqueObjets) {
@@ -152,10 +159,15 @@ export default class piece3 extends Phaser.Scene {
         entite.body.setAllowGravity(false);
         entite.setVelocityX(0); 
         entite.play(animation);
+
+        if (image === "img_requin") {
+          entite.body.setSize(150, 60, true);
+          entite.body.setOffset(60, 40); 
+        }
       });
     }
   }
-
+ 
   afficherRegles() {
     this.groupeRegles = this.add.container(0, 0).setScrollFactor(0).setDepth(200);
     let fond = this.add.graphics();
@@ -165,7 +177,7 @@ export default class piece3 extends Phaser.Scene {
       { fontSize: '18px', fill: '#fff', align: 'center', wordWrap: { width: 350 } }).setOrigin(0.5);
     this.groupeRegles.add([fond, texte]);
   }
-
+ 
   update() {
     if (!this.jeuLance) {
         if (Phaser.Input.Keyboard.JustDown(this.clavier.space)) {
@@ -173,15 +185,15 @@ export default class piece3 extends Phaser.Scene {
         }
         return;
     }
-
+ 
     if (this.player.isDead) {
         this.player.setVelocity(0, 0); 
         this.texteTimer.setText("DOMMAGE !");
         return; 
     }
-
+ 
     this.texteTimer.setText('Temps: ' + this.tempsRestant);
-
+ 
     if (this.clavier.left.isDown) {
         this.player.setVelocityX(-this.vitesse);
         this.player.anims.play("nage_gauche", true);
@@ -192,25 +204,36 @@ export default class piece3 extends Phaser.Scene {
         this.player.setVelocityX(0);
         this.player.anims.play("nage_statique", true);
     }
-
+ 
     if (this.clavier.up.isDown) this.player.setVelocityY(-150);
     else if (this.clavier.down.isDown) this.player.setVelocityY(150);
     else this.player.setVelocityY(0);
-
+ 
     this.offset += 0.03;
     this.player.y += Math.sin(this.offset) * 0.5;
-
+ 
     this.recyclerEnnemis(this.poissons);
     this.recyclerEnnemis(this.tortues);
     this.recyclerEnnemis(this.requins);
-
+ 
     if (Phaser.Input.Keyboard.JustDown(this.clavier.space)) {
         if (this.physics.overlap(this.player, this.porte_devant)) {
-            this.scene.start("piece4"); 
+            this.scene.start("piece4");
         }
     }
-}
+    let distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.porte_devant.x, this.porte_devant.y);
 
+    if (distance < 100) {
+        this.textePorte.setVisible(true);
+
+        if (Phaser.Input.Keyboard.JustDown(this.clavier.space)) {
+            this.scene.start("piece4");
+        }
+    } else {
+        this.textePorte.setVisible(false); 
+    }
+}
+ 
   demarrerPartie() {
     this.groupeRegles.destroy();
     this.jeuLance = true;
@@ -222,7 +245,7 @@ export default class piece3 extends Phaser.Scene {
       });
     });
   }
-
+ 
   recyclerEnnemis(groupe) {
     groupe.children.iterate(ennemi => {
       if (ennemi && ennemi.x < -100) {
@@ -234,24 +257,24 @@ export default class piece3 extends Phaser.Scene {
       }
     });
   }
-
+ 
   attraperPoisson(player, poisson) {
     poisson.x = 3300;
     this.vitesse += 25;
   }
-
+ 
   attraperTortue(player, tortue) {
     tortue.x = 3300;
     this.vitesse -= 25;
   }
-
+ 
   toucherRequin() {
     if (this.player.isDead) return;
     this.player.isDead = true;
     this.player.setTint(0xff0000);
     this.player.setVelocity(0, 0);
     this.cameras.main.shake(300, 0.02);
-
+ 
     this.time.delayedCall(800, () => {
       this.player.setPosition(100, 300);
       this.player.clearTint();
@@ -260,14 +283,14 @@ export default class piece3 extends Phaser.Scene {
       this.resetTimer();
     });
   }
-
+ 
   compteARebours() {
     if (this.player.isDead || !this.jeuLance) return;
     this.tempsRestant--;
     this.texteTimer.setText('Temps: ' + this.tempsRestant);
     if (this.tempsRestant <= 0) this.toucherRequin();
   }
-
+ 
   resetTimer() {
     this.tempsRestant = 30;
     this.texteTimer.setText('Temps: 30');

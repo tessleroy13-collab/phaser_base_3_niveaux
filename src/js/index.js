@@ -1,9 +1,9 @@
 // chargement des librairies
 import selection from "/src/js/selection.js";
 import piece1 from "/src/js/piece1.js";
+import piece2 from "/src/js/piece2.js";
 import piece3 from "/src/js/piece3.js";
 import piece4 from "/src/js/piece4.js";
-import piece2 from "/src/js/piece2.js";
 
 
 // configuration générale du jeu

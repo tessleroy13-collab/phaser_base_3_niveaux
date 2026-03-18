@@ -1,37 +1,58 @@
-//fonction tirer( ), prenant comme paramètre l'auteur du tir
-function tirer(player) {
-        var coefDir;
-	    if (player.direction == 'left') { coefDir = -1; } else { coefDir = 1 }
-        // on crée la balle a coté du joueur
-        var bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
-        // parametres physiques de la balle.
-        bullet.setCollideWorldBounds(true);
-        // on acive la détection de l'evenement "collision au bornes"
-        bullet.body.onWorldBounds = true; 
-        bullet.body.allowGravity =false;
-        bullet.setVelocity(1000 * coefDir, 0); // vitesse en x et en y
-}  
+// chargement des librairies
 
-// fonction déclenchée lorsque uneBalle et uneCible se superposent
-function hit (bullet, cible) {
-  cible.pointsVie--;
-  if (cible.pointsVie==0) {
-    cible.destroy(); 
-  } 
-   bullet.destroy();
-}  
+/***********************************************************************/
+/** CONFIGURATION GLOBALE DU JEU ET LANCEMENT 
+/***********************************************************************/
 
-export default class niveau2 extends Phaser.Scene {
-  // constructeur de la classe
-  constructor() {
-    super({
-      key: "niveau2" //  ici on précise le nom de la classe en tant qu'identifiant
-    });
+// configuration générale du jeu
+var config = {
+  type: Phaser.AUTO,
+  width: 800, // largeur en pixels
+  height: 600, // hauteur en pixels
+  physics: {
+    // définition des parametres physiques
+    default: "arcade", // mode arcade : le plus simple : des rectangles pour gérer les collisions. Pas de pentes
+    arcade: {
+      // parametres du mode arcade
+      gravity: {
+        y: 300 // gravité verticale : acceleration ddes corps en pixels par seconde
+      },
+      debug: true // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
+    }
+  },
+  scene: {
+    // une scene est un écran de jeu. Pour fonctionner il lui faut 3 fonctions  : create, preload, update
+    preload: preload, // la phase preload est associée à la fonction preload, du meme nom (on aurait pu avoir un autre nom)
+    create: create, // la phase create est associée à la fonction create, du meme nom (on aurait pu avoir un autre nom)
+    update: update // la phase update est associée à la fonction update, du meme nom (on aurait pu avoir un autre nom)
   }
+};
 
-  
+// création et lancement du jeu
+new Phaser.Game(config);
 
-  preload() {
+/***********************************************************************/
+/** VARIABLES GLOBALES 
+/***********************************************************************/
+
+var player; // désigne le sprite du joueur
+var groupe_plateformes; // contient toutes les plateformes
+var clavier; // pour la gestion du clavier
+var boutonFeu; 
+// mise en place d'une variable groupeBullets
+var groupeBullets; 
+// mise en place d'une variable groupeCibles
+var groupeCibles;  
+
+/***********************************************************************/
+/** FONCTION PRELOAD 
+/***********************************************************************/
+
+/** La fonction preload est appelée une et une seule fois,
+ * lors du chargement de la scene dans le jeu.
+ * On y trouve surtout le chargement des assets (images, son ..)
+ */
+function preload() {
   // tous les assets du jeu sont placés dans le sous-répertoire src/assets/
   this.load.image("img_ciel", "src/assets/sky.png");
   this.load.image("img_plateforme", "src/assets/platform.png");
@@ -41,27 +62,23 @@ export default class niveau2 extends Phaser.Scene {
   });
 
 // chargement de l'image balle.png
- this.load.image("bullet", "src/assets/balle.png"); 
+ this.load.image("bullet", "assets/balle.png"); 
  // chargement de l'image cible.png
- this.load.image("cible", "src/assets/cible.png"); 
-  }
+ this.load.image("cible", "assets/cible.png"); 
+}
 
-  create() {
-    /***********************************************************************/
-    /** VARIABLES GLOBALES 
-    /***********************************************************************/
-    var player; // désigne le sprite du joueur
-    var groupe_plateformes; // contient toutes les plateformes
-    var clavier; // pour la gestion du clavier
-    var boutonFeu; 
-    // mise en place d'une variable groupeBullets
-    var groupeBullets; 
-    // mise en place d'une variable groupeCibles
-    var groupeCibles;  
-    var cursors;
-    var cibles;
+/***********************************************************************/
+/** FONCTION CREATE 
+/***********************************************************************/
 
-    /*************************************
+/* La fonction create est appelée lors du lancement de la scene
+ * si on relance la scene, elle sera appelée a nouveau
+ * on y trouve toutes les instructions permettant de créer la scene
+ * placement des peronnages, des sprites, des platesformes, création des animations
+ * ainsi que toutes les instructions permettant de planifier des evenements
+ */
+function create() {
+  /*************************************
    *  CREATION DU MONDE + PLATEFORMES  *
    *************************************/
 
@@ -156,11 +173,15 @@ groupeBullets = this.physics.add.group();
         });  
 
 // ajout du modèle de collision entre cibles et plate-formes
-        this.physics.add.collider(cibles, groupe_plateformes); 
-  }
+        this.physics.add.collider(cibles, platforms);  
+}
 
-  update() {
-    if (clavier.left.isDown) {
+/***********************************************************************/
+/** FONCTION UPDATE 
+/***********************************************************************/
+
+function update() {
+  if (clavier.left.isDown) {
     player.direction = 'left';
     player.setVelocityX(-160);
     player.anims.play("anim_tourne_gauche", true);
@@ -203,7 +224,7 @@ this.physics.world.on("worldbounds", function(body) {
             objet.destroy();
         }
     });
-  }
+}  
 
 
 //fonction tirer( ), prenant comme paramètre l'auteur du tir

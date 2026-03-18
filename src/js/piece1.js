@@ -8,7 +8,7 @@ export default class piece1 extends Phaser.Scene {
     this.load.image("img_plateauxbois", "src/assets/tilesets/plateauxbois.png");
     this.load.image("img_plateaux", "src/assets/plateau.png"); 
     this.load.tilemapTiledJSON("carte", "src/assets/map.tmj");
-    this.load.spritesheet("img_bob", "src/assets/bob.png", {
+    this.load.spritesheet("img_bob", "src/assets/dude.png", {
       frameWidth: 173, frameHeight: 228
     });
   }

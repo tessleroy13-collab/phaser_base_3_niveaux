@@ -13,6 +13,8 @@ export default class piece1 extends Phaser.Scene {
       frameWidth: 173,
       frameHeight: 228
     });
+    // --- CHARGEMENT DE LA RAIE ---
+    this.load.image("img_raie", "src/assets/Raie.png");
   }
 
   create() {
@@ -32,11 +34,11 @@ export default class piece1 extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, largeurCarte, hauteurCarte);
 
     // --- CONFIGURATION DE LA PORTE ---
-    this.porte = this.physics.add.sprite(3150, 100, "porte2");
+    this.porte = this.physics.add.sprite(3160, 275, "porte2");
     this.porte.setOrigin(0.5, 0.5);
     this.porte.setImmovable(true);
     this.porte.body.allowGravity = false;
-    this.porte.setScale(0.03);
+    this.porte.setScale(0.06);
     this.porte.setDepth(5);
 
     // JOUEUR
@@ -47,7 +49,7 @@ export default class piece1 extends Phaser.Scene {
 
     this.physics.add.collider(this.player, plateformesLayer);
 
-    // Collision avec la porte -> Déclenche la fonction passerPorte
+    // Collision avec la porte
     this.physics.add.overlap(this.player, this.porte, this.passerPorte, null, this);
 
     this.player.body.onWorldBounds = true;
@@ -65,11 +67,10 @@ export default class piece1 extends Phaser.Scene {
       this.anims.create({ key: 'right', frames: this.anims.generateFrameNumbers('img_bob', { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
     }
 
-    // PLATEFORMES MOBILES
+    // --- PLATEFORMES MOBILES ---
     const tab_points = carteDuNiveau.getObjectLayer("departPlatforme");
     if (tab_points) {
       this.groupe_plateformes = this.physics.add.group({ allowGravity: false, immovable: true });
-
       tab_points.objects.forEach(obj => {
         let p = this.groupe_plateformes.create(obj.x, obj.y, "img_plateaux");
         p.setOrigin(0, 1);
@@ -113,12 +114,31 @@ export default class piece1 extends Phaser.Scene {
       });
     }
 
+    // --- CONFIGURATION DES RAIES (ENNEMIS) ---
+    const pointsRaies = carteDuNiveau.getObjectLayer("calque_raie");
+    this.groupe_raies = this.physics.add.group({ allowGravity: false, immovable: true });
+
+    if (pointsRaies) {
+      pointsRaies.objects.forEach(obj => {
+        let raie = this.groupe_raies.create(obj.x, obj.y, "img_raie");
+        raie.setScale(0.2); // Ajuste la taille si besoin
+        raie.setFlipX(true); // Si l'image regarde à droite, on la tourne vers la gauche
+        raie.setVelocityX(-120); // Vitesse vers la gauche
+      });
+    }
+
+    // Si Bob touche une raie, il meurt
+    this.physics.add.overlap(this.player, this.groupe_raies, (joueur, raie) => {
+      this.mort(joueur);
+    }, null, this);
+
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
   }
 
   update() {
     if (!this.clavier || !this.player || this.player.isDead) return;
 
+    // Déplacement de Bob
     if (this.clavier.left.isDown) {
       this.player.setVelocityX(-160);
       this.player.anims.play('left', true);
@@ -130,6 +150,7 @@ export default class piece1 extends Phaser.Scene {
       this.player.anims.play('turn');
     }
 
+    // Reset gravité inversée
     if (this.clavier.down.isDown) {
       this.player.body.setGravityY(0);
       this.player.setFlipY(false);
@@ -146,6 +167,7 @@ export default class piece1 extends Phaser.Scene {
       }
     }
 
+    // Mise à jour des plateformes mobiles
     if (this.groupe_plateformes) {
       this.groupe_plateformes.children.iterate((p) => {
         if (!p.isPlafond) {
@@ -158,20 +180,27 @@ export default class piece1 extends Phaser.Scene {
             p.compteurVitesse = 0;
           }
         }
-        // Entraînement du joueur par la plateforme
         if ((this.player.body.touching.down || this.player.body.touching.up) && this.player.body.gameObject === p) {
           this.player.x += p.body.deltaX();
           this.player.y += p.body.deltaY();
         }
       });
     }
+
+    // --- BOUCLE INFINIE DES RAIES ---
+    if (this.groupe_raies) {
+      this.groupe_raies.children.iterate((raie) => {
+        // Si la raie sort de l'écran à gauche, elle revient à droite
+        if (raie.x < -100) {
+          raie.x = this.physics.world.bounds.width + 100;
+        }
+      });
+    }
   }
 
-  // --- LA FONCTION POUR CHANGER DE PIÈCE ---
   passerPorte(p, porte) {
     if (!p.isDead) {
       p.setVelocity(0, 0);
-      // On lance la scène suivante !
       this.scene.start("piece2");
     }
   }

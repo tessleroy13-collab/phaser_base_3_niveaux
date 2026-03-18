@@ -7,7 +7,7 @@ export default class piece3 extends Phaser.Scene {
     });
   }
 
-preload() {
+  preload() {
     this.load.spritesheet("img_bobnage", "src/assets/bobnage.png", { 
       frameWidth: 146, 
       frameHeight: 78 
@@ -167,33 +167,35 @@ preload() {
   }
 
   update() {
-
     if (!this.jeuLance) {
-      if (Phaser.Input.Keyboard.JustDown(this.clavier.space)) {
-        this.demarrerPartie();
-      }
-      return;
+        if (Phaser.Input.Keyboard.JustDown(this.clavier.space)) {
+            this.demarrerPartie();
+        }
+        return;
     }
 
-    if (this.player.isDead) return;
+    if (this.player.isDead) {
+        this.player.setVelocity(0, 0); 
+        this.texteTimer.setText("DOMMAGE !");
+        return; 
+    }
 
+    this.texteTimer.setText('Temps: ' + this.tempsRestant);
 
     if (this.clavier.left.isDown) {
-      this.player.setVelocityX(-this.vitesse);
-      this.player.anims.play("nage_gauche", true);
+        this.player.setVelocityX(-this.vitesse);
+        this.player.anims.play("nage_gauche", true);
     } else if (this.clavier.right.isDown) {
-      this.player.setVelocityX(this.vitesse);
-      this.player.anims.play("nage_droite", true);
+        this.player.setVelocityX(this.vitesse);
+        this.player.anims.play("nage_droite", true);
     } else {
-      this.player.setVelocityX(0);
-      this.player.anims.play("nage_statique", true);
+        this.player.setVelocityX(0);
+        this.player.anims.play("nage_statique", true);
     }
-
 
     if (this.clavier.up.isDown) this.player.setVelocityY(-150);
     else if (this.clavier.down.isDown) this.player.setVelocityY(150);
     else this.player.setVelocityY(0);
-
 
     this.offset += 0.03;
     this.player.y += Math.sin(this.offset) * 0.5;
@@ -203,11 +205,14 @@ preload() {
     this.recyclerEnnemis(this.requins);
 
     if (Phaser.Input.Keyboard.JustDown(this.clavier.space)) {
-      if (this.physics.overlap(this.player, this.porte_retour)) {
-        this.scene.start("selection");
-      }
+        if (this.physics.overlap(this.player, this.porte_devant)) {
+            this.scene.start("piece4"); 
+        }
+        if (this.physics.overlap(this.player, this.porte_retour)) {
+            this.scene.start("selection");
+        }
     }
-  }
+}
 
   demarrerPartie() {
     this.groupeRegles.destroy();

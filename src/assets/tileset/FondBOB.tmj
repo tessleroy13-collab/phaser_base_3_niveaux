@@ -4,7 +4,7 @@
      "export":
         {
          "format":"json",
-         "target":"..\/FondBOB.json"
+         "target":"..\/FondBOB.tmj"
         }
     },
  "height":20,
@@ -36,7 +36,7 @@
          "name":"Calque de Tuiles 1",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":100,
          "x":0,
          "y":0
@@ -187,7 +187,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }],

@@ -3,6 +3,8 @@ import selection from "/src/js/selection.js";
 import niveau1 from "/src/js/niveau1.js";
 import piece4 from "/src/js/piece4.js";
 import niveau3 from "/src/js/niveau3.js";
+import piece2 from "/src/js/piece2.js";
+
 
 // configuration générale du jeu
 var config = {
@@ -22,7 +24,7 @@ var config = {
       gravity: {
         y: 300 // gravité verticale : acceleration ddes corps en pixels par seconde
       },
-      debug: true // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
+      debug: false // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
   scene: [selection, niveau1, piece4, niveau3]

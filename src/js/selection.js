@@ -46,8 +46,8 @@ export default class selection extends Phaser.Scene {
    * ainsi que toutes les instructions permettant de planifier des evenements
    */
   create() {
-      fct.doNothing();
-      fct.doAlsoNothing();
+    fct.doNothing();
+    fct.doAlsoNothing();
 
     /*************************************
      *  CREATION DU MONDE + PLATEFORMES  *
@@ -148,7 +148,7 @@ export default class selection extends Phaser.Scene {
 /***********************************************************************/
 
   update() {
-    
+
     if (clavier.left.isDown) {
       player.setVelocityX(-160);
       player.anims.play("anim_tourne_gauche", true);
@@ -158,10 +158,6 @@ export default class selection extends Phaser.Scene {
     } else {
       player.setVelocityX(0);
       player.anims.play("anim_face");
-    }
-
-    if (clavier.up.isDown && player.body.touching.down) {
-      player.setVelocityY(-330);
     }
 
     if (Phaser.Input.Keyboard.JustDown(clavier.space) == true) {
@@ -174,7 +170,3 @@ export default class selection extends Phaser.Scene {
     }
   }
 }
-
-/***********************************************************************/
-/** CONFIGURATION GLOBALE DU JEU ET LANCEMENT 
-/***********************************************************************/

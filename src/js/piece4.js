@@ -105,6 +105,7 @@ export default class piece4 extends Phaser.Scene {
     this.physics.add.collider(player, calque_plateformes);
     this.physics.add.collider(groupe_ennemis, calque_plateformes);
     this.physics.add.overlap(groupeBullets, groupe_ennemis, hit, null, this);
+    this.physics.add.overlap(player, groupe_ennemis, contactEnnemi, null, this);
 
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
 
@@ -125,6 +126,14 @@ export default class piece4 extends Phaser.Scene {
     
     // On peut aussi arrêter les animations
     player.anims.stop();
+
+    this.tweens.add({
+        targets: player,
+        x: player.x + 4,
+        duration: 40,
+        yoyo: true,
+        repeat: -1
+    });
 
     this.time.addEvent({
         delay: 2000,
@@ -202,5 +211,38 @@ function hit(bullet, ennemi) {
     ennemi.destroy();
     score += 10;
     scoreText.setText('Score: ' + score);
+  }
+}
+
+function contactEnnemi(player, ennemi) {
+  // Si Bob n'est pas déjà en train de mourir
+  if (this.isRestarting === false) {
+    this.isRestarting = true;
+
+    // Bob s'arrête et devient rouge
+    player.setVelocity(0, 0);
+    player.setTint(0xff0000);
+    player.anims.stop();
+    
+    // On peut aussi faire reculer un peu Bob pour l'effet de choc
+    player.setVelocityY(-150);
+
+    this.tweens.add({
+        targets: player,
+        x: player.x + 4,
+        duration: 40,
+        yoyo: true,
+        repeat: -1
+    });
+    
+    // On attend 2 secondes avant de recommencer
+    this.time.addEvent({
+      delay: 2000,
+      callback: () => {
+        this.isRestarting = false;
+        this.scene.restart();
+      },
+      loop: false
+    });
   }
 }

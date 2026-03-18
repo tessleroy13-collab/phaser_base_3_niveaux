@@ -19,7 +19,7 @@ export default class piece2 extends Phaser.Scene {
 
     preload() {
         // Chargement des images et sprites
-        this.load.spritesheet("bob", "src/assets/bob.png", { frameWidth: 282, frameHeight: 416 });
+        this.load.spritesheet("bobSM", "src/assets/bob.png", { frameWidth: 282, frameHeight: 416 });
         this.load.image("patrick", "src/assets/patrick.png");
         this.load.image("pierre1", "src/assets/tileset/pierre1.png");
         this.load.image("pierre2", "src/assets/tileset/pierre2.png");

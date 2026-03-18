@@ -4,74 +4,74 @@ export default class menu extends Phaser.Scene {
     }
 
     preload() {
-        // Chargement des images (vérifie bien les noms de tes fichiers dans assets)
-        this.load.image("menu_fond", "src/assets/sky.png");
+        this.load.image("page_acceuil", "src/assets/page_acceuil.png");
         this.load.image("imageBoutonPlay", "src/assets/button_play.png");
     }
 
     create() {
-        // --- 1. LE FOND ---
-        // On met le ciel en fond, légèrement agrandi pour éviter les bords blancs
-        this.add.image(400, 300, "menu_fond").setScale(1.2);
+        // 1. LE FOND
+        this.add.image(400, 300, "page_acceuil").setDisplaySize(800, 600);
 
-        // --- 2. LE TITRE ---
-        // Un gros titre blanc avec un contour noir pour le style "MultiMap"
-        let titre = this.add.text(400, 250, "MULTIMAP", {
-            fontFamily: 'Arial Black',
-            fontSize: "70pt",
-            fill: "#ffffff",
-            stroke: "#000000",
-            strokeThickness: 12
+        // 2. LE TITRE : STYLE BOB (Orange avec contour)
+        // Taille réduite à 50pt au lieu de 65pt
+        let titre = this.add.text(400, 220, "BOB ADVENTURE", {
+            fontFamily: 'Arial Black', // Idéalement, utilise une police 'SpongeBob' si tu en as une
+            fontSize: "50pt", 
+            fill: "#ff9900", // ORANGE
+            stroke: "#ffff00", // Contour JAUNE pour le style cartoon
+            strokeThickness: 10,
+            shadow: { blur: 10, color: '#000', fill: true } // Petite ombre pour le relief
         }).setOrigin(0.5);
 
-        // --- 3. LE BOUTON PLAY ---
-        // On place le bouton au centre, un peu plus bas
-        this.bouton_play = this.add.image(400, 450, "imageBoutonPlay");
-        this.bouton_play.setScale(0.6);
+        // 3. LE BOUTON PLAY
+        this.bouton_play = this.add.image(400, 400, "imageBoutonPlay");
+        this.bouton_play.setScale(0.5); // Bouton un peu plus petit aussi
         this.bouton_play.setInteractive({ useHandCursor: true });
 
-        // --- 4. ANIMATIONS (Le côté "Jolie") ---
-        
-        // Animation du titre : il monte et descend doucement
+        // 4. TEXTE D'INSTRUCTION (Orange également)
+        this.instruction = this.add.text(400, 500, "Appuie sur ESPACE pour jouer", {
+            fontFamily: 'Arial Black',
+            fontSize: "18pt",
+            fill: "#ff9900",
+            stroke: "#000000",
+            strokeThickness: 4
+        }).setOrigin(0.5);
+
+        // 5. ANIMATIONS
         this.tweens.add({
             targets: titre,
-            y: 230,
+            y: 200,
             duration: 2000,
             yoyo: true,
             loop: -1,
             ease: 'Sine.easeInOut'
         });
 
-        // Animation du bouton : il "respire" (grossit et rétrécit)
         this.tweens.add({
-            targets: this.bouton_play,
-            scale: 0.65,
-            duration: 1000,
+            targets: this.instruction,
+            alpha: 0.5,
+            duration: 800,
             yoyo: true,
-            loop: -1,
-            ease: 'Back.easeInOut'
+            loop: -1
         });
 
-        // --- 5. INTERACTIONS ---
-
-        // Quand la souris passe dessus
-        this.bouton_play.on("pointerover", () => {
-            this.bouton_play.setTint(0x00ffff); // Devient bleu cyan
+        // 6. COMMANDES
+        this.input.keyboard.once('keydown-SPACE', () => {
+            this.lancerLeJeu();
         });
 
-        // Quand la souris part
-        this.bouton_play.on("pointerout", () => {
-            this.bouton_play.clearTint();
-        });
-
-        // Quand on clique : ON VA À LA PIECE 2
         this.bouton_play.on("pointerup", () => {
-            // Petit effet de caméra pour le punch
-            this.cameras.main.fadeOut(500, 0, 0, 0);
-            
-            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-                this.scene.start("piece2"); 
-            });
+            this.lancerLeJeu();
+        });
+
+        this.bouton_play.on("pointerover", () => this.bouton_play.setTint(0xffcc00));
+        this.bouton_play.on("pointerout", () => this.bouton_play.clearTint());
+    }
+
+    lancerLeJeu() {
+        this.cameras.main.fadeOut(500, 0, 0, 0);
+        this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+            this.scene.start("piece2", { dejaJoue: false });
         });
     }
 }

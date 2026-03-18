@@ -149,6 +149,11 @@ export default class piece3 extends Phaser.Scene {
         entite.body.setAllowGravity(false);
         entite.setVelocityX(0); 
         entite.play(animation);
+
+        if (image === "img_requin") {
+          entite.body.setSize(150, 60, true);
+          entite.body.setOffset(60, 40); 
+        }
       });
     }
   }

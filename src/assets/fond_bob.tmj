@@ -3,8 +3,7 @@
     {
      "export":
         {
-         "format":"json",
-         "target":"..\/..\/..\/fond_bob.tmj"
+         "format":"json"
         }
     },
  "height":20,
@@ -137,16 +136,614 @@
         {
          "draworder":"topdown",
          "id":3,
-         "name":"Calque d'Objets 1",
-         "objects":[],
+         "name":"calque_poissons",
+         "objects":[
+                {
+                 "height":0,
+                 "id":29,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":319,
+                 "y":164
+                }, 
+                {
+                 "height":0,
+                 "id":30,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":431,
+                 "y":397
+                }, 
+                {
+                 "height":0,
+                 "id":31,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1056,
+                 "y":70
+                }, 
+                {
+                 "height":0,
+                 "id":32,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":803,
+                 "y":612
+                }, 
+                {
+                 "height":0,
+                 "id":33,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1540,
+                 "y":564
+                }, 
+                {
+                 "height":0,
+                 "id":34,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1823,
+                 "y":569
+                }, 
+                {
+                 "height":0,
+                 "id":35,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1791,
+                 "y":101
+                }, 
+                {
+                 "height":0,
+                 "id":36,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1759,
+                 "y":128
+                }, 
+                {
+                 "height":0,
+                 "id":37,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1728,
+                 "y":159
+                }, 
+                {
+                 "height":0,
+                 "id":38,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2037,
+                 "y":614
+                }, 
+                {
+                 "height":0,
+                 "id":39,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2337,
+                 "y":627
+                }, 
+                {
+                 "height":0,
+                 "id":40,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2205,
+                 "y":187
+                }, 
+                {
+                 "height":0,
+                 "id":41,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":3134,
+                 "y":55
+                }, 
+                {
+                 "height":0,
+                 "id":42,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":3133,
+                 "y":123
+                }, 
+                {
+                 "height":0,
+                 "id":43,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":3089,
+                 "y":77
+                }, 
+                {
+                 "height":0,
+                 "id":44,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":3039,
+                 "y":42
+                }, 
+                {
+                 "height":0,
+                 "id":45,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":3007,
+                 "y":97
+                }, 
+                {
+                 "height":0,
+                 "id":46,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":969,
+                 "y":400
+                }, 
+                {
+                 "height":0,
+                 "id":80,
+                 "name":"poisson",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":702,
+                 "y":502
+                }, 
+                {
+                 "height":0,
+                 "id":81,
+                 "name":"poisson ",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2398,
+                 "y":322
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":9,
+         "name":"calque_tortues",
+         "objects":[
+                {
+                 "height":0,
+                 "id":47,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":286.666666666667,
+                 "y":505.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":48,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":349.333333333333,
+                 "y":442.666666666667
+                }, 
+                {
+                 "height":0,
+                 "id":49,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":541.333333333333,
+                 "y":546.666666666667
+                }, 
+                {
+                 "height":0,
+                 "id":50,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1050.66666666667,
+                 "y":545.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":51,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":736,
+                 "y":64
+                }, 
+                {
+                 "height":0,
+                 "id":52,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1341.33333333333,
+                 "y":62.6666666666667
+                }, 
+                {
+                 "height":0,
+                 "id":53,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1290.66666666667,
+                 "y":105.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":54,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1808,
+                 "y":634.666666666667
+                }, 
+                {
+                 "height":0,
+                 "id":55,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1764,
+                 "y":236
+                }, 
+                {
+                 "height":0,
+                 "id":56,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1602.66666666667,
+                 "y":161.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":57,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2374.66666666667,
+                 "y":562.666666666667
+                }, 
+                {
+                 "height":0,
+                 "id":58,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2881.33333333333,
+                 "y":62.6666666666667
+                }, 
+                {
+                 "height":0,
+                 "id":59,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2941.33333333333,
+                 "y":128
+                }, 
+                {
+                 "height":0,
+                 "id":60,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":3012,
+                 "y":188
+                }, 
+                {
+                 "height":0,
+                 "id":61,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":3097.33333333333,
+                 "y":224
+                }, 
+                {
+                 "height":0,
+                 "id":62,
+                 "name":"tortue",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":3109.33333333333,
+                 "y":449.333333333333
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":10,
+         "name":"calque_requins",
+         "objects":[
+                {
+                 "height":0,
+                 "id":64,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":648,
+                 "y":478.666666666667
+                }, 
+                {
+                 "height":0,
+                 "id":65,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":896,
+                 "y":533.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":66,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1210.66666666667,
+                 "y":438.666666666667
+                }, 
+                {
+                 "height":0,
+                 "id":68,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1344,
+                 "y":316
+                }, 
+                {
+                 "height":0,
+                 "id":69,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2042.66666666667,
+                 "y":312
+                }, 
+                {
+                 "height":0,
+                 "id":70,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1916,
+                 "y":352
+                }, 
+                {
+                 "height":0,
+                 "id":73,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2113.33333333333,
+                 "y":496
+                }, 
+                {
+                 "height":0,
+                 "id":74,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2208,
+                 "y":548
+                }, 
+                {
+                 "height":0,
+                 "id":75,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2812,
+                 "y":465.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":76,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2620,
+                 "y":430.666666666667
+                }, 
+                {
+                 "height":0,
+                 "id":78,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":3064,
+                 "y":298.666666666667
+                }, 
+                {
+                 "height":0,
+                 "id":79,
+                 "name":"requin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2844,
+                 "y":260
+                }],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,
          "x":0,
          "y":0
         }],
- "nextlayerid":8,
- "nextobjectid":6,
+ "nextlayerid":11,
+ "nextobjectid":85,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -8936,7 +9533,7 @@
                         {
                          "name":"estSolide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -8945,7 +9542,7 @@
                         {
                          "name":"estSolide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -8954,7 +9551,7 @@
                         {
                          "name":"estSolide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -8963,7 +9560,7 @@
                         {
                          "name":"estSolide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -8972,7 +9569,7 @@
                         {
                          "name":"estSolide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -10567,7 +11164,7 @@
                         {
                          "name":"estSolide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {
@@ -10576,7 +11173,7 @@
                         {
                          "name":"estSolide",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }]
                 }, 
                 {

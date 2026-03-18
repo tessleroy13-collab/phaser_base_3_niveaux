@@ -186,7 +186,7 @@ export default class piece2 extends Phaser.Scene {
             onComplete: () => {
                 this.cameras.main.fadeOut(500, 0, 0, 0);
                 this.cameras.main.once('camerafadeoutcomplete', () => {
-                    this.scene.start("piece3"); 
+                    this.scene.switch("piece3"); 
                 });
             }
         });

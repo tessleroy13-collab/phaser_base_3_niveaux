@@ -16,6 +16,7 @@ export default class piece4 extends Phaser.Scene {
       frameWidth: 173,
       frameHeight: 228
     });
+    this.load.image("img_porte", "src/assets/porte4.png");
   }
 
   create() {
@@ -29,7 +30,11 @@ export default class piece4 extends Phaser.Scene {
     calque_plateformes.setCollisionByProperty({ estSolide: true });
 
     // Personnage
-    player = this.physics.add.sprite(60, 100, "img_perso");
+    const porte = this.add.image(35, 100, "img_porte");
+    porte.setScale(0.4); // Ajuste la taille pour qu'elle corresponde à Bob
+
+    // 2. On crée Bob exactement aux mêmes coordonnées que la porte
+    player = this.physics.add.sprite(80, 100, "img_perso");
     player.setScale(0.2);
     player.body.setSize(60, 210);
     player.body.setOffset(55, 10);
@@ -234,7 +239,7 @@ function contactEnnemi(player, ennemi) {
         yoyo: true,
         repeat: -1
     });
-    
+
     // On attend 2 secondes avant de recommencer
     this.time.addEvent({
       delay: 2000,

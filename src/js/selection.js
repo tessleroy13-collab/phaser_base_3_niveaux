@@ -46,8 +46,6 @@ export default class selection extends Phaser.Scene {
    * ainsi que toutes les instructions permettant de planifier des evenements
    */
   create() {
-      fct.doNothing();
-      fct.doAlsoNothing();
 
     /*************************************
      *  CREATION DU MONDE + PLATEFORMES  *
@@ -165,9 +163,9 @@ export default class selection extends Phaser.Scene {
 
     if (Phaser.Input.Keyboard.JustDown(clavier.space) == true) {
       if (this.physics.overlap(player, this.porte1))
-        this.scene.switch("niveau1");
+        this.scene.switch("piece1");
       if (this.physics.overlap(player, this.porte2))
-        this.scene.switch("niveau2");
+        this.scene.switch("piece4");
       if (this.physics.overlap(player, this.porte3))
         this.scene.switch("piece3");
     }

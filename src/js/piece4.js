@@ -86,6 +86,9 @@ export default class piece4 extends Phaser.Scene {
     // Collisions
     this.physics.add.collider(player, calque_plateformes);
     this.physics.add.collider(groupe_ennemis, calque_plateformes);
+    this.physics.add.collider(groupeBullets, calque_plateformes, (bullet) => {
+    bullet.destroy(); // La balle disparait si elle touche un mur/solide
+}, null, this);
     this.physics.add.overlap(groupeBullets, groupe_ennemis, hit, null, this);
     this.physics.add.overlap(player, groupe_ennemis, contactEnnemi, null, this);
 
@@ -97,6 +100,13 @@ export default class piece4 extends Phaser.Scene {
   }
 
   update() {
+    // Nettoyage des balles qui sortent des limites de la map
+    groupeBullets.children.each(function(b) {
+        if (b.active && (b.x < 0 || b.x > this.physics.world.bounds.width)) {
+            b.destroy();
+        }
+    }, this);
+
     if (this.isRestarting) return;
 
     // Mort par la chute
@@ -189,14 +199,22 @@ var groupe_ennemis;
 function tirer(player) {
   var coefDir = (player.direction == 'left') ? -1 : 1;
   var bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
-  bullet.setCollideWorldBounds(true);
+  
+  bullet.setCollideWorldBounds(false); 
+  
+  // On remplace le bug par cette propriété simple :
+  bullet.outOfBoundsKill = true; 
+  bullet.checkWorldBounds = true;
+
   bullet.body.allowGravity = false;
-  bullet.setVelocity(300 * coefDir, 0);
+  bullet.setVelocity(200 * coefDir, 0); // Vitesse modérée (2000 c'était une téléportation !)
   bullet.setScale(0.07);
 }
 
 function hit(bullet, ennemi) {
-  bullet.destroy();
+  // On vérifie que la balle existe encore avant de la détruire
+  if (bullet) bullet.destroy();
+  
   ennemi.pointsVie--;
   if (ennemi.pointsVie <= 0) {
     ennemi.destroy();
@@ -237,3 +255,4 @@ function contactEnnemi(player, ennemi) {
     });
   }
 }
+

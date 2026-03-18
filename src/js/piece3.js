@@ -7,29 +7,16 @@ export default class piece3 extends Phaser.Scene {
     });
   }
 
-git config --global user.email "eloise.brest@epfedu.fr"
-  git config --global user.name "eloise-bst"
-  preload() {
-    this.load.spritesheet("img_bobnage", "src/assets/bobnage.png", { 
-      frameWidth: 146, 
-      frameHeight: 78
-    });
+preload() {
+    this.load.spritesheet("img_bobnage", "src/assets/bobnage.png", { frameWidth: 146, frameHeight: 78 });
     this.load.image("image_fond", "src/assets/tileset/fond.png");
     this.load.image("image_bob", "src/assets/tileset/tuiles_bob.png");
     this.load.tilemapTiledJSON("carte", "src/assets/fond_bob.tmj");
-    this.load.spritesheet("img_poisson", "src/assets/poisson.png", { 
-      frameWidth: 316, 
-      frameHeight: 216 
-    });
-    this.load.spritesheet("img_tortue", "src/assets/tortue.png", { 
-      frameWidth: 46, 
-      frameHeight: 16 
-    });
-    this.load.spritesheet("img_requin", "src/assets/requins.png", { 
-      frameWidth: 288, 
-      frameHeight: 135 
-    });
-    this.load.image("img_porteouverte", "src/assets/porteouverte.png");
+    this.load.spritesheet("img_poisson", "src/assets/poisson.png", { frameWidth: 316, frameHeight: 216 });
+    this.load.spritesheet("img_tortue", "src/assets/tortue.png", { frameWidth: 46, frameHeight: 16 });
+    this.load.spritesheet("img_requin", "src/assets/requins.png", { frameWidth: 288, frameHeight: 135 });
+    this.load.image("img_porte3bis", "src/assets/porte3bis.png");
+    this.load.image("img_porte4", "src/assets/porte4.png");
   }
 
   create() {
@@ -45,10 +32,11 @@ git config --global user.email "eloise.brest@epfedu.fr"
 
     plateformes.setCollisionByProperty({ estSolide: true });
 
+    // === JOUEUR (BOB) ===
     this.player = this.physics.add.sprite(100, 300, "img_bobnage").setScale(0.6); 
     this.player.setCollideWorldBounds(true);
     this.player.setDepth(10);
-    this.player.body.setAllowGravity(false);
+    this.player.body.setAllowGravity(false); // Pas de gravité au début
     this.physics.add.collider(this.player, plateformes); 
     this.clavier = this.input.keyboard.createCursorKeys();
 
@@ -56,65 +44,15 @@ git config --global user.email "eloise.brest@epfedu.fr"
     this.cameras.main.setBounds(0, 0, 3200, 640);
     this.cameras.main.startFollow(this.player);
 
-    this.anims.create({ 
-      key: "nage_gauche", 
-      frames: this.anims.generateFrameNumbers("img_bobnage", { 
-        start: 0, 
-        end: 6 
-      }), 
-      frameRate: 10, 
-      repeat: -1 
-    });
+    // === ANIMATIONS ===
+    this.anims.create({ key: "nage_gauche", frames: this.anims.generateFrameNumbers("img_bobnage", { start: 0, end: 6 }), frameRate: 10, repeat: -1 });
+    this.anims.create({ key: "nage_droite", frames: this.anims.generateFrameNumbers("img_bobnage", { start: 7, end: 13 }), frameRate: 10, repeat: -1 });
+    this.anims.create({ key: "nage_statique", frames: [{ key: "img_bobnage", frame: 7 }], frameRate: 10 });
+    this.anims.create({ key: "anim_poisson", frames: this.anims.generateFrameNumbers("img_poisson", { start: 0, end: 3 }), frameRate: 8, repeat: -1 });
+    this.anims.create({ key: "anim_tortue", frames: this.anims.generateFrameNumbers("img_tortue", { start: 0, end: 5 }), frameRate: 6, repeat: -1 });
+    this.anims.create({ key: "anim_requin", frames: this.anims.generateFrameNumbers("img_requin", { start: 0, end: 5 }), frameRate: 10, repeat: -1 });
 
-    this.anims.create({ 
-      key: "nage_droite", 
-      frames: this.anims.generateFrameNumbers("img_bobnage", { 
-        start: 7, 
-        end: 13 
-      }), 
-      frameRate: 10, 
-      repeat: -1 
-    });
-
-    this.anims.create({ 
-      key: "nage_statique", 
-      frames: [{ 
-        key: "img_bobnage", 
-        frame: 7 
-      }], 
-      frameRate: 10 
-    });
-
-    this.anims.create({ 
-      key: "anim_poisson", 
-      frames: this.anims.generateFrameNumbers("img_poisson", { 
-        start: 0, 
-        end: 3 
-      }), 
-      frameRate: 8, 
-      repeat: -1 
-    });
-
-    this.anims.create({ 
-      key: "anim_tortue", 
-      frames: this.anims.generateFrameNumbers("img_tortue", { 
-        start: 0, 
-        end: 5 
-      }), 
-      frameRate: 6, 
-      repeat: -1 
-    });
-
-    this.anims.create({ 
-      key: "anim_requin", 
-      frames: this.anims.generateFrameNumbers("img_requin", { 
-        start: 0, 
-        end: 5 
-      }), 
-      frameRate: 10, 
-      repeat: -1 
-    });
-
+    // === GROUPES ET SPAWN ===
     this.poissons = this.physics.add.group();
     this.tortues = this.physics.add.group();
     this.requins = this.physics.add.group();
@@ -129,7 +67,7 @@ git config --global user.email "eloise.brest@epfedu.fr"
           let en = group.create(obj.x, obj.y, cleImage);
           en.setScale(scale);
           en.body.setAllowGravity(false);
-          en.setVelocityX(0);
+          en.setVelocityX(0); // FIGÉS AU DÉBUT
           en.play(anim);
         });
       }
@@ -139,8 +77,13 @@ git config --global user.email "eloise.brest@epfedu.fr"
     spawnLayer("calque_tortues", this.tortues, "anim_tortue", 1.8, "img_tortue");
     spawnLayer("calque_requins", this.requins, "anim_requin", 0.5, "img_requin");
 
-    this.porte_retour = this.physics.add.staticSprite(100, 300, "img_porteouverte");
+    // === PORTE ET INTERACTIONS ===
+    this.porte_retour = this.physics.add.staticSprite(100, 300, "img_porte3bis");
     this.porte_retour.setScale(0.4).refreshBody().setDepth(1);
+
+    this.porte_devant = this.physics.add.staticSprite(3100, 500, "img_porte4");
+    this.porte_devant.refreshBody();
+    this.porte_devant.setDepth(1);
 
     this.physics.add.overlap(this.player, this.poissons, this.attraperPoisson, null, this);
     this.physics.add.overlap(this.player, this.tortues, this.attraperTortue, null, this);
@@ -170,7 +113,7 @@ git config --global user.email "eloise.brest@epfedu.fr"
     fondRegles.fillStyle(0x000000, 0.8);
     fondRegles.fillRect(200, 150, 400, 300);
     let texteRegles = this.add.text(400, 300, 
-        "BIENVENUE !\n\n Atteins la PORTE en moins de 30s\n- POISSON : Accélère (+)\n- TORTUE : Ralentit (-)\n- REQUIN / VIDE : Tu meurs\n\nAppuie sur ESPACE pour commencer", 
+        "BIENVENUE !\n\n- Atteins la PORTE en moins de 30s\n- POISSON : Accélère (+)\n- TORTUE : Ralentit (-)\n- REQUIN / VIDE : Tu meurs\n\nAppuie sur ESPACE pour commencer", 
         { fontSize: '18px', fill: '#ffffff', align: 'center', wordWrap: { width: 350 } }
     ).setOrigin(0.5);
     this.groupeRegles.add([fondRegles, texteRegles]);
@@ -183,25 +126,17 @@ git config --global user.email "eloise.brest@epfedu.fr"
     // === GESTION DU DÉMARRAGE ===
     if (!this.jeuLance) {
         if (Phaser.Input.Keyboard.JustDown(this.clavier.space)) {
-    this.groupeRegles.destroy();
-    this.jeuLance = true;
-    this.timerGlobal.paused = false;
-
-    // Vitesse lente pour les TORTUES (ex: entre -40 et -60)
-    this.tortues.children.iterate(t => {
-        t.setVelocityX(Phaser.Math.Between(-60, -40));
-    });
-
-    // Vitesse rapide pour les REQUINS (ex: entre -150 et -200)
-    this.requins.children.iterate(r => {
-        r.setVelocityX(Phaser.Math.Between(-200, -150));
-    });
-
-    // Vitesse normale pour les POISSONS
-    this.poissons.children.iterate(p => {
-        p.setVelocityX(Phaser.Math.Between(-120, -70));
-    });
-}
+            this.groupeRegles.destroy();
+            this.jeuLance = true;
+            this.timerGlobal.paused = false;
+            // On libère les animaux
+            [this.poissons, this.tortues, this.requins].forEach(groupe => {
+                groupe.children.iterate(ennemi => {
+                    ennemi.setVelocityX(Phaser.Math.Between(-120, -70));
+                });
+            });
+        }
+        return; // PAUSE TOTALE TANT QUE PAS ESPACE
     }
     
     if (this.player.isDead) return;

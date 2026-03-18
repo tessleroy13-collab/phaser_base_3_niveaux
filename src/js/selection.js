@@ -33,6 +33,7 @@ export default class selection extends Phaser.Scene {
     this.load.image("img_porte1", "src/assets/door1.png");
     this.load.image("img_porte2", "src/assets/door2.png");
     this.load.image("img_porte3", "src/assets/door3.png");
+    this.load.image("img_underwater", "src/assets/underwater.png");
   }
 
   /***********************************************************************/
@@ -169,7 +170,7 @@ export default class selection extends Phaser.Scene {
       if (this.physics.overlap(player, this.porte2))
         this.scene.switch("niveau2");
       if (this.physics.overlap(player, this.porte3))
-        this.scene.switch("niveau3");
+        this.scene.switch("piece3");
     }
   }
 }

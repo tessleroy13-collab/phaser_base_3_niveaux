@@ -2,7 +2,7 @@
 import selection from "/src/js/selection.js";
 import niveau1 from "/src/js/niveau1.js";
 import niveau2 from "/src/js/niveau2.js";
-import niveau3 from "/src/js/niveau3.js";
+import piece3 from "/src/js/piece3.js";
 
 // configuration générale du jeu
 var config = {
@@ -25,7 +25,7 @@ var config = {
       debug: true // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [selection, niveau1, niveau2, niveau3]
+  scene: [selection, niveau1, niveau2, piece3]
 };
 
 // création et lancement du jeu

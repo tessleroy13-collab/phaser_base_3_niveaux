@@ -187,6 +187,7 @@ export default class piece4 extends Phaser.Scene {
             }
         }
     });
+
   }
 } // <--- FIN DE LA CLASSE PIECE4
 

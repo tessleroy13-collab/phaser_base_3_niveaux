@@ -25,7 +25,7 @@ export default class piece1 extends Phaser.Scene {
     const tileset_bois = carteDuNiveau.addTilesetImage("plateauxbois", "img_plateauxbois");
     const tousLesTilesets = [tileset_fond, tileset_bois];
 
-    const backgroundLayer = carteDuNiveau.createLayer("Calque de Tuiles 4", tousLesTilesets);
+    const backgroundLayer = carteDuNiveau.createLayer("Calque", tousLesTilesets);
     const plateformesLayer = carteDuNiveau.createLayer("tuiles_de_jeu", tousLesTilesets);
 
     plateformesLayer.setCollisionByProperty({ estSolide: true });

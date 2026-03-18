@@ -1,18 +1,18 @@
 import * as fct from "/src/js/fonctions.js";
 
 
-var player; 
-var clavier; 
+var player;
+var clavier;
 var groupe_plateformes;
 
 export default class selection extends Phaser.Scene {
   constructor() {
-    super({ key: "selection" }); 
+    super({ key: "selection" });
   }
 
 
   preload() {
-    
+   
     this.load.image("img_ciel", "src/assets/page_acceuil.png");
     this.load.image("img_plateforme", "src/assets/platform.png");
     this.load.spritesheet("img_perso", "src/assets/dude.png", {
@@ -22,7 +22,7 @@ export default class selection extends Phaser.Scene {
     this.load.image("img_porte1", "src/assets/door1.png");
     this.load.image("img_porte2", "src/assets/door2.png");
     this.load.image("img_porte3", "src/assets/door3.png");
-    this.load.image("img_porte_debut", "src/assets/portedebut.png"); 
+    this.load.image("img_porte_debut", "src/assets/portedebut.png");
   }
 
 
@@ -61,17 +61,17 @@ export default class selection extends Phaser.Scene {
 
     player = this.physics.add.sprite(100, 450, "img_perso");
     player.setScale(0.5);
-    player.setCollideWorldBounds(true); 
+    player.setCollideWorldBounds(true);
     player.setGravityY(500);
 
     this.anims.create({
-      key: "anim_tourne_gauche", 
+      key: "anim_tourne_gauche",
       frames: this.anims.generateFrameNumbers("img_perso", {
         start: 1,
         end: 3
-      }), 
-      frameRate: 10, 
-      repeat: -1 
+      }),
+      frameRate: 10,
+      repeat: -1
     });
 
     this.anims.create({
@@ -99,7 +99,7 @@ export default class selection extends Phaser.Scene {
 
 
   update() {
-    
+   
     if (clavier.left.isDown) {
       player.setVelocityX(-160);
       player.anims.play("anim_tourne_gauche", true);
@@ -131,4 +131,6 @@ export default class selection extends Phaser.Scene {
     }
   }
 }
+
+
 

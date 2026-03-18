@@ -7,24 +7,24 @@ export default class piece3 extends Phaser.Scene {
   }
  
   preload() {
-    this.load.spritesheet("img_bobnage", "src/assets/bobnage.png", { 
-      frameWidth: 146, 
-      frameHeight: 78 
+    this.load.spritesheet("img_bobnage", "src/assets/bobnage.png", {
+      frameWidth: 146,
+      frameHeight: 78
     });
     this.load.image("image_fond", "src/assets/tileset/fond.png");
     this.load.image("image_bob", "src/assets/tileset/tuiles_bob.png");
     this.load.tilemapTiledJSON("cartes", "src/assets/fond_bob.tmj");
-    this.load.spritesheet("img_poisson", "src/assets/poisson.png", { 
-      frameWidth: 316, 
-      frameHeight: 216 
+    this.load.spritesheet("img_poisson", "src/assets/poisson.png", {
+      frameWidth: 316,
+      frameHeight: 216
     });
-    this.load.spritesheet("img_tortue", "src/assets/tortue.png", { 
-      frameWidth: 46, 
-      frameHeight: 16 
+    this.load.spritesheet("img_tortue", "src/assets/tortue.png", {
+      frameWidth: 46,
+      frameHeight: 16
     });
-    this.load.spritesheet("img_requin", "src/assets/requins.png", { 
-      frameWidth: 288, 
-      frameHeight: 135 
+    this.load.spritesheet("img_requin", "src/assets/requins.png", {
+      frameWidth: 288,
+      frameHeight: 135
     });
     this.load.image("img_porte2bis", "src/assets/porte2bis.png");
     this.load.image("img_porte4", "src/assets/porte4.png");
@@ -54,58 +54,58 @@ export default class piece3 extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, 3200, 640);
     this.cameras.main.startFollow(this.player);
  
-    this.anims.create({ 
-      key: "nage_gauche", 
-      frames: this.anims.generateFrameNumbers("img_bobnage", { 
-        start: 0, 
-        end: 6 
-      }), 
-      frameRate: 10, 
-      repeat: -1 
+    this.anims.create({
+      key: "nage_gauche",
+      frames: this.anims.generateFrameNumbers("img_bobnage", {
+        start: 0,
+        end: 6
+      }),
+      frameRate: 10,
+      repeat: -1
     });
-    this.anims.create({ 
-      key: "nage_droite", 
-      frames: this.anims.generateFrameNumbers("img_bobnage", { 
-        start: 7, 
-        end: 13 
-      }), 
-      frameRate: 10, 
-      repeat: -1 
+    this.anims.create({
+      key: "nage_droite",
+      frames: this.anims.generateFrameNumbers("img_bobnage", {
+        start: 7,
+        end: 13
+      }),
+      frameRate: 10,
+      repeat: -1
     });
-    this.anims.create({ 
-      key: "nage_statique", 
-      frames: [{ 
-        key: "img_bobnage", 
-        frame: 7 
-      }], 
-      frameRate: 10 
+    this.anims.create({
+      key: "nage_statique",
+      frames: [{
+        key: "img_bobnage",
+        frame: 7
+      }],
+      frameRate: 10
     });
-    this.anims.create({ 
-      key: "anim_poisson", 
-      frames: this.anims.generateFrameNumbers("img_poisson", { 
-        start: 0, 
-        end: 3 
-      }), 
-      frameRate: 8, 
-      repeat: -1 
+    this.anims.create({
+      key: "anim_poisson",
+      frames: this.anims.generateFrameNumbers("img_poisson", {
+        start: 0,
+        end: 3
+      }),
+      frameRate: 8,
+      repeat: -1
     });
-    this.anims.create({ 
-      key: "anim_tortue", 
-      frames: this.anims.generateFrameNumbers("img_tortue", { 
-        start: 0, 
-        end: 5 
-      }), 
-      frameRate: 6, 
-      repeat: -1 
+    this.anims.create({
+      key: "anim_tortue",
+      frames: this.anims.generateFrameNumbers("img_tortue", {
+        start: 0,
+        end: 5
+      }),
+      frameRate: 6,
+      repeat: -1
     });
-    this.anims.create({ 
-      key: "anim_requin", 
-      frames: this.anims.generateFrameNumbers("img_requin", { 
-        start: 0, 
-        end: 5 
-      }), 
-      frameRate: 10, 
-      repeat: -1 
+    this.anims.create({
+      key: "anim_requin",
+      frames: this.anims.generateFrameNumbers("img_requin", {
+        start: 0,
+        end: 5
+      }),
+      frameRate: 10,
+      repeat: -1
     });
  
     this.poissons = this.physics.add.group();
@@ -157,12 +157,12 @@ export default class piece3 extends Phaser.Scene {
         let entite = groupe.create(objet.x, objet.y, image);
         entite.setScale(echelle);
         entite.body.setAllowGravity(false);
-        entite.setVelocityX(0); 
+        entite.setVelocityX(0);
         entite.play(animation);
 
         if (image === "img_requin") {
           entite.body.setSize(150, 60, true);
-          entite.body.setOffset(60, 40); 
+          entite.body.setOffset(60, 40);
         }
       });
     }
@@ -173,7 +173,7 @@ export default class piece3 extends Phaser.Scene {
     let fond = this.add.graphics();
     fond.fillStyle(0x000000, 0.8);
     fond.fillRect(200, 150, 400, 300);
-    let texte = this.add.text(400, 300, "BIENVENUE !\n\n Atteins la porte de l'autre coté en 30s\n- POISSON : Accélère\n- TORTUE : Ralentit\n- REQUIN / VIDE : Perdu\n\n Appuie sur ESPACE pour commencer", 
+    let texte = this.add.text(400, 300, "BIENVENUE !\n\n Atteins la porte de l'autre coté en 30s\n- POISSON : Accélère\n- TORTUE : Ralentit\n- REQUIN / VIDE : Perdu\n\n Appuie sur ESPACE pour commencer",
       { fontSize: '18px', fill: '#fff', align: 'center', wordWrap: { width: 350 } }).setOrigin(0.5);
     this.groupeRegles.add([fond, texte]);
   }
@@ -187,9 +187,9 @@ export default class piece3 extends Phaser.Scene {
     }
  
     if (this.player.isDead) {
-        this.player.setVelocity(0, 0); 
+        this.player.setVelocity(0, 0);
         this.texteTimer.setText("DOMMAGE !");
-        return; 
+        return;
     }
  
     this.texteTimer.setText('Temps: ' + this.tempsRestant);
@@ -230,7 +230,7 @@ export default class piece3 extends Phaser.Scene {
             this.scene.start("piece4");
         }
     } else {
-        this.textePorte.setVisible(false); 
+        this.textePorte.setVisible(false);
     }
 }
  
@@ -238,7 +238,7 @@ export default class piece3 extends Phaser.Scene {
     this.groupeRegles.destroy();
     this.jeuLance = true;
     this.timerGlobal.paused = false;
-    
+   
     [this.poissons, this.tortues, this.requins].forEach(groupe => {
       groupe.children.iterate(ennemi => {
         ennemi.setVelocityX(Phaser.Math.Between(-120, -70));
@@ -295,4 +295,4 @@ export default class piece3 extends Phaser.Scene {
     this.tempsRestant = 30;
     this.texteTimer.setText('Temps: 30');
   }
-}
+  }

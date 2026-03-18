@@ -195,6 +195,9 @@ var score = 0;
 var scoreText;
 var calque_plateformes;
 var groupe_ennemis;
+var ennemisTues = 0;
+var totalEnnemis = 8;
+var messageTexte;
 
 function tirer(player) {
   var coefDir = (player.direction == 'left') ? -1 : 1;

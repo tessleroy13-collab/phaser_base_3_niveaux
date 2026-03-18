@@ -6,7 +6,7 @@ export default class piece1 extends Phaser.Scene {
   preload() {
     this.load.image("img_fond1", "src/assets/tilesets/fond1.png");
     this.load.image("img_plateauxbois", "src/assets/tilesets/plateauxbois.png");
-    this.load.image("img_plateaux", "src/assets/plateau.png"); 
+    this.load.image("img_plateaux", "src/assets/plateau.png");
     this.load.tilemapTiledJSON("carte", "src/assets/map.tmj");
     this.load.spritesheet("img_bob", "src/assets/dude.png", {
       frameWidth: 173, frameHeight: 228
@@ -30,9 +30,9 @@ export default class piece1 extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, largeurCarte, hauteurCarte);
 
     player = this.physics.add.sprite(100, 50, "img_bob");
-    player.setDisplaySize(40, 40);
+    player.setScale(0.2);
     player.setCollideWorldBounds(true);
-    player.body.setGravityY(300); 
+    player.body.setGravityY(300);
 
     this.physics.add.collider(player, plateformesLayer);
 
@@ -46,9 +46,9 @@ export default class piece1 extends Phaser.Scene {
     clavier = this.input.keyboard.createCursorKeys();
 
     if (!this.anims.exists('left')) {
-        this.anims.create({ key: 'left', frames: this.anims.generateFrameNumbers('img_bob', { start: 1, end: 3 }), frameRate: 10, repeat: -1 });
-        this.anims.create({ key: 'turn', frames: [{ key: 'img_bob', frame: 4 }], frameRate: 20 });
-        this.anims.create({ key: 'right', frames: this.anims.generateFrameNumbers('img_bob', { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
+      this.anims.create({ key: 'left', frames: this.anims.generateFrameNumbers('img_bob', { start: 1, end: 3 }), frameRate: 10, repeat: -1 });
+      this.anims.create({ key: 'turn', frames: [{ key: 'img_bob', frame: 4 }], frameRate: 20 });
+      this.anims.create({ key: 'right', frames: this.anims.generateFrameNumbers('img_bob', { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
     }
 
     const tab_points = carteDuNiveau.getObjectLayer("departPlatforme");
@@ -65,10 +65,10 @@ export default class piece1 extends Phaser.Scene {
         let distMax = 200;
         let plafond = false;
         let vertical = false; // Nouvelle propriété
-        
+
         if (obj.properties) {
           const props = Array.isArray(obj.properties) ? obj.properties : [];
-          
+
           const dProp = props.find(pr => pr.name === "distance" || pr.name === "distante");
           if (dProp) distMax = dProp.value;
 
@@ -82,9 +82,9 @@ export default class piece1 extends Phaser.Scene {
         p.isPlafond = plafond;
         p.estVertical = vertical; // On stocke l'info
         p.limiteDeCourse = distMax;
-        p.compteurVitesse = Math.floor(Math.random() * distMax); 
+        p.compteurVitesse = Math.floor(Math.random() * distMax);
         p.directionSigne = 1; // 1 pour droite/bas, -1 pour gauche/haut
-        
+
         if (p.isPlafond) {
           p.setVelocity(0, 0);
         } else {
@@ -97,10 +97,10 @@ export default class piece1 extends Phaser.Scene {
       });
 
       this.physics.add.collider(player, groupe_plateformes, (p, plateforme) => {
-          if (plateforme.isPlafond) {
-              p.body.setGravityY(-1000); 
-              p.setFlipY(true);
-          }
+        if (plateforme.isPlafond) {
+          p.body.setGravityY(-1000);
+          p.setFlipY(true);
+        }
       });
     }
 
@@ -122,36 +122,36 @@ export default class piece1 extends Phaser.Scene {
     }
 
     if (clavier.down.isDown) {
-        player.body.setGravityY(0); 
-        player.setFlipY(false);
+      player.body.setGravityY(0);
+      player.setFlipY(false);
     }
 
     const surSolOuPlanche = player.body.blocked.down || player.body.touching.down;
     const sousPlancheInversee = player.body.blocked.up || player.body.touching.up;
 
     if (clavier.up.isDown) {
-        if (surSolOuPlanche && player.body.gravity.y >= 0) {
-            player.setVelocityY(-350);
-        } else if (sousPlancheInversee && player.body.gravity.y < 0) {
-            player.setVelocityY(350); 
-        }
+      if (surSolOuPlanche && player.body.gravity.y >= 0) {
+        player.setVelocityY(-350);
+      } else if (sousPlancheInversee && player.body.gravity.y < 0) {
+        player.setVelocityY(350);
+      }
     }
 
     if (groupe_plateformes) {
       groupe_plateformes.children.iterate(function (p) {
         if (!p.isPlafond) {
-            p.compteurVitesse++;
-            if (p.compteurVitesse >= p.limiteDeCourse) {
-              p.directionSigne *= -1; // On inverse la direction
-              let vitesse = 80 * p.directionSigne;
-              
-              if (p.estVertical) {
-                p.setVelocityY(vitesse);
-              } else {
-                p.setVelocityX(vitesse);
-              }
-              p.compteurVitesse = 0;
+          p.compteurVitesse++;
+          if (p.compteurVitesse >= p.limiteDeCourse) {
+            p.directionSigne *= -1; // On inverse la direction
+            let vitesse = 80 * p.directionSigne;
+
+            if (p.estVertical) {
+              p.setVelocityY(vitesse);
+            } else {
+              p.setVelocityX(vitesse);
             }
+            p.compteurVitesse = 0;
+          }
         }
 
         // Entraînement de Bob (horizontal ET vertical)

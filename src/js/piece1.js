@@ -13,8 +13,10 @@ export default class piece1 extends Phaser.Scene {
       frameWidth: 173,
       frameHeight: 228
     });
-    // --- CHARGEMENT DE LA RAIE ---
-    this.load.image("img_raie", "src/assets/Raie.png");
+
+    // --- CHARGEMENT DES DEUX IMAGES DE LA RAIE ---
+    this.load.image("raie_frame1", "src/assets/Raie.png");
+    this.load.image("raie_frame2", "src/assets/Raie25.png");
   }
 
   create() {
@@ -33,7 +35,7 @@ export default class piece1 extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, largeurCarte, hauteurCarte);
     this.cameras.main.setBounds(0, 0, largeurCarte, hauteurCarte);
 
-    // --- CONFIGURATION DE LA PORTE ---
+    // PORTE
     this.porte = this.physics.add.sprite(3160, 275, "porte2");
     this.porte.setOrigin(0.5, 0.5);
     this.porte.setImmovable(true);
@@ -48,8 +50,6 @@ export default class piece1 extends Phaser.Scene {
     this.player.body.setGravityY(300);
 
     this.physics.add.collider(this.player, plateformesLayer);
-
-    // Collision avec la porte
     this.physics.add.overlap(this.player, this.porte, this.passerPorte, null, this);
 
     this.player.body.onWorldBounds = true;
@@ -60,14 +60,27 @@ export default class piece1 extends Phaser.Scene {
     });
 
     this.clavier = this.input.keyboard.createCursorKeys();
+    // Ajout de la touche Espace pour le saut
+    this.toucheEspace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
+    // ANIMATIONS BOB
     if (!this.anims.exists('left')) {
       this.anims.create({ key: 'left', frames: this.anims.generateFrameNumbers('img_bob', { start: 1, end: 3 }), frameRate: 10, repeat: -1 });
       this.anims.create({ key: 'turn', frames: [{ key: 'img_bob', frame: 4 }], frameRate: 20 });
       this.anims.create({ key: 'right', frames: this.anims.generateFrameNumbers('img_bob', { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
     }
 
-    // --- PLATEFORMES MOBILES ---
+    // --- CRÉATION DE L'ANIMATION DE LA RAIE ---
+    if (!this.anims.exists('nager_raie')) {
+        this.anims.create({
+            key: 'nager_raie',
+            frames: [{ key: 'raie_frame1' }, { key: 'raie_frame2' }],
+            frameRate: 5,
+            repeat: -1
+        });
+    }
+
+    // PLATEFORMES MOBILES (Conservées)
     const tab_points = carteDuNiveau.getObjectLayer("departPlatforme");
     if (tab_points) {
       this.groupe_plateformes = this.physics.add.group({ allowGravity: false, immovable: true });
@@ -98,36 +111,30 @@ export default class piece1 extends Phaser.Scene {
         p.compteurVitesse = Math.floor(Math.random() * distMax);
         p.directionSigne = 1;
 
-        if (p.isPlafond) {
-          p.setVelocity(0, 0);
-        } else {
+        if (p.isPlafond) { p.setVelocity(0, 0); } 
+        else {
           if (p.estVertical) p.setVelocityY(80);
           else p.setVelocityX(80);
         }
       });
 
-      this.physics.add.collider(this.player, this.groupe_plateformes, (joueur, plateforme) => {
-        if (plateforme.isPlafond) {
-          joueur.body.setGravityY(-1000);
-          joueur.setFlipY(true);
-        }
-      });
+      this.physics.add.collider(this.player, this.groupe_plateformes);
     }
 
-    // --- CONFIGURATION DES RAIES (ENNEMIS) ---
+    // --- CONFIGURATION DES RAIES ---
     const pointsRaies = carteDuNiveau.getObjectLayer("calque_raie");
     this.groupe_raies = this.physics.add.group({ allowGravity: false, immovable: true });
 
     if (pointsRaies) {
       pointsRaies.objects.forEach(obj => {
-        let raie = this.groupe_raies.create(obj.x, obj.y, "img_raie");
-        raie.setScale(0.2); // Ajuste la taille si besoin
-        raie.setFlipX(true); // Si l'image regarde à droite, on la tourne vers la gauche
-        raie.setVelocityX(-120); // Vitesse vers la gauche
+        let raie = this.groupe_raies.create(obj.x, obj.y, "raie_frame1");
+        raie.setScale(0.2); 
+        raie.play('nager_raie');
+        raie.setFlipX(true); 
+        raie.setVelocityX(-120); 
       });
     }
 
-    // Si Bob touche une raie, il meurt
     this.physics.add.overlap(this.player, this.groupe_raies, (joueur, raie) => {
       this.mort(joueur);
     }, null, this);
@@ -138,7 +145,16 @@ export default class piece1 extends Phaser.Scene {
   update() {
     if (!this.clavier || !this.player || this.player.isDead) return;
 
-    // Déplacement de Bob
+    // --- MODIF : CHANGEMENT DE GRAVITÉ MANUEL ---
+    if (this.clavier.down.isDown) {
+      this.player.body.setGravityY(-1000); // Inverse la gravité
+      this.player.setFlipY(true);          // Bob a la tête en bas
+    } else if (this.clavier.up.isDown) {
+      this.player.body.setGravityY(300);   // Gravité normale
+      this.player.setFlipY(false);         // Bob est à l'endroit
+    }
+
+    // Déplacement latéral
     if (this.clavier.left.isDown) {
       this.player.setVelocityX(-160);
       this.player.anims.play('left', true);
@@ -150,24 +166,16 @@ export default class piece1 extends Phaser.Scene {
       this.player.anims.play('turn');
     }
 
-    // Reset gravité inversée
-    if (this.clavier.down.isDown) {
-      this.player.body.setGravityY(0);
-      this.player.setFlipY(false);
-    }
-
-    const surSolOuPlanche = this.player.body.blocked.down || this.player.body.touching.down;
-    const sousPlancheInversee = this.player.body.blocked.up || this.player.body.touching.up;
-
-    if (this.clavier.up.isDown) {
-      if (surSolOuPlanche && this.player.body.gravity.y >= 0) {
-        this.player.setVelocityY(-350);
-      } else if (sousPlancheInversee && this.player.body.gravity.y < 0) {
-        this.player.setVelocityY(350);
+    // --- MODIF : GESTION DU SAUT AVEC ESPACE ---
+    if (Phaser.Input.Keyboard.JustDown(this.toucheEspace)) {
+      if (this.player.body.blocked.down || this.player.body.touching.down) {
+        this.player.setVelocityY(-350); // Saut normal
+      } else if (this.player.body.blocked.up || this.player.body.touching.up) {
+        this.player.setVelocityY(350);  // Saut quand on est au plafond
       }
     }
 
-    // Mise à jour des plateformes mobiles
+    // Mise à jour des plateformes (Conservée)
     if (this.groupe_plateformes) {
       this.groupe_plateformes.children.iterate((p) => {
         if (!p.isPlafond) {
@@ -187,12 +195,14 @@ export default class piece1 extends Phaser.Scene {
       });
     }
 
-    // --- BOUCLE INFINIE DES RAIES ---
+    // Mise à jour des raies
     if (this.groupe_raies) {
       this.groupe_raies.children.iterate((raie) => {
-        // Si la raie sort de l'écran à gauche, elle revient à droite
+        raie.setFlipX(raie.body.velocity.x < 0);
         if (raie.x < -100) {
           raie.x = this.physics.world.bounds.width + 100;
+        } else if (raie.x > this.physics.world.bounds.width + 100) {
+          raie.x = -100;
         }
       });
     }

@@ -138,6 +138,16 @@ export default class piece3 extends Phaser.Scene {
     this.vitesse = 120;
     this.offset = 0;
     this.afficherRegles();
+
+    this.textePorte = this.add.text(400, 500, "Appuyez sur ESPACE pour ouvrir", {
+    fontSize: '20px',
+    fill: '#fff',
+    backgroundColor: '#000000aa',
+    padding: { x: 10, y: 5 }
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(100);
+
+
+    this.textePorte.setVisible(false);
   }
  
   creerDepuisTiled(carte, nomCalque, groupe, animation, echelle, image) {
@@ -149,6 +159,11 @@ export default class piece3 extends Phaser.Scene {
         entite.body.setAllowGravity(false);
         entite.setVelocityX(0); 
         entite.play(animation);
+
+        if (image === "img_requin") {
+          entite.body.setSize(150, 60, true);
+          entite.body.setOffset(60, 40); 
+        }
       });
     }
   }
@@ -205,6 +220,17 @@ export default class piece3 extends Phaser.Scene {
         if (this.physics.overlap(this.player, this.porte_devant)) {
             this.scene.start("piece4");
         }
+    }
+    let distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.porte_devant.x, this.porte_devant.y);
+
+    if (distance < 100) {
+        this.textePorte.setVisible(true);
+
+        if (Phaser.Input.Keyboard.JustDown(this.clavier.space)) {
+            this.scene.start("piece4");
+        }
+    } else {
+        this.textePorte.setVisible(false); 
     }
 }
  

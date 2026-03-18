@@ -27,7 +27,7 @@ export default class piece3 extends Phaser.Scene {
       frameWidth: 288, 
       frameHeight: 135 
     });
-    this.load.image("img_porte3bis", "src/assets/porte3bis.png");
+    this.load.image("img_porte2bis", "src/assets/porte2bis.png");
     this.load.image("img_porte4", "src/assets/porte4.png");
   }
 
@@ -117,7 +117,7 @@ export default class piece3 extends Phaser.Scene {
     this.creerDepuisTiled(carteDuNiveau, "calque_tortues", this.tortues, "anim_tortue", 1.8, "img_tortue");
     this.creerDepuisTiled(carteDuNiveau, "calque_requins", this.requins, "anim_requin", 0.5, "img_requin");
 
-    this.porte_retour = this.physics.add.staticSprite(100, 300, "img_porte3bis").setScale(0.4).refreshBody();
+    this.porte_retour = this.physics.add.staticSprite(100, 300, "img_porte2bis").setScale(0.4).refreshBody();
     this.porte_devant = this.physics.add.staticSprite(3100, 500, "img_porte4").refreshBody();
 
     this.physics.add.overlap(this.player, this.poissons, this.attraperPoisson, null, this);
@@ -161,7 +161,7 @@ export default class piece3 extends Phaser.Scene {
     let fond = this.add.graphics();
     fond.fillStyle(0x000000, 0.8);
     fond.fillRect(200, 150, 400, 300);
-    let texte = this.add.text(400, 300, "BIENVENUE !\n\n Atteins la porte de l'autre coté en 30s\n- POISSON : Accélère\n- TORTUE : Ralentit\n- REQUIN / VIDE : Perdu\n\n[ ESPACE ] pour commencer", 
+    let texte = this.add.text(400, 300, "BIENVENUE !\n\n Atteins la porte de l'autre coté en 30s\n- POISSON : Accélère\n- TORTUE : Ralentit\n- REQUIN / VIDE : Perdu\n\n Appuie sur ESPACE pour commencer", 
       { fontSize: '18px', fill: '#fff', align: 'center', wordWrap: { width: 350 } }).setOrigin(0.5);
     this.groupeRegles.add([fond, texte]);
   }
@@ -207,9 +207,6 @@ export default class piece3 extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.clavier.space)) {
         if (this.physics.overlap(this.player, this.porte_devant)) {
             this.scene.start("piece4"); 
-        }
-        if (this.physics.overlap(this.player, this.porte_retour)) {
-            this.scene.start("selection");
         }
     }
 }

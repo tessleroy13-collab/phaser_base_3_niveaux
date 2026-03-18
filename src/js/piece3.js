@@ -27,7 +27,7 @@ export default class piece3 extends Phaser.Scene {
       frameWidth: 288, 
       frameHeight: 135 
     });
-    this.load.image("img_porte3bis", "src/assets/porte3bis.png");
+    this.load.image("img_porte2bis", "src/assets/porte2bis.png");
     this.load.image("img_porte4", "src/assets/porte4.png");
   }
 
@@ -117,7 +117,7 @@ export default class piece3 extends Phaser.Scene {
     this.creerDepuisTiled(carteDuNiveau, "calque_tortues", this.tortues, "anim_tortue", 1.8, "img_tortue");
     this.creerDepuisTiled(carteDuNiveau, "calque_requins", this.requins, "anim_requin", 0.5, "img_requin");
 
-    this.porte_retour = this.physics.add.staticSprite(100, 300, "img_porte3bis").setScale(0.4).refreshBody();
+    this.porte_retour = this.physics.add.staticSprite(100, 300, "img_porte2bis").setScale(0.4).refreshBody();
     this.porte_devant = this.physics.add.staticSprite(3100, 500, "img_porte4").refreshBody();
 
     this.physics.add.overlap(this.player, this.poissons, this.attraperPoisson, null, this);

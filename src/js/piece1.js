@@ -52,15 +52,18 @@ export default class piece1 extends Phaser.Scene {
     this.physics.add.collider(this.player, plateformesLayer);
     this.physics.add.overlap(this.player, this.porte, this.passerPorte, null, this);
 
+    // --- MODIFICATION ICI : DÉTECTION DES BORDURES DU MONDE ---
     this.player.body.onWorldBounds = true;
     this.physics.world.on('worldbounds', (body) => {
-      if (body.gameObject === this.player && body.blocked.down) {
-        this.mort(this.player);
+      if (body.gameObject === this.player) {
+        // Meurt s'il touche le BAS du monde OU le HAUT du monde
+        if (body.blocked.down || body.blocked.up) {
+          this.mort(this.player);
+        }
       }
     });
 
     this.clavier = this.input.keyboard.createCursorKeys();
-    // Ajout de la touche Espace pour le saut
     this.toucheEspace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
     // ANIMATIONS BOB
@@ -70,7 +73,7 @@ export default class piece1 extends Phaser.Scene {
       this.anims.create({ key: 'right', frames: this.anims.generateFrameNumbers('img_bob', { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
     }
 
-    // --- CRÉATION DE L'ANIMATION DE LA RAIE ---
+    // ANIMATION RAIE
     if (!this.anims.exists('nager_raie')) {
         this.anims.create({
             key: 'nager_raie',
@@ -80,7 +83,7 @@ export default class piece1 extends Phaser.Scene {
         });
     }
 
-    // PLATEFORMES MOBILES (Conservées)
+    // PLATEFORMES MOBILES
     const tab_points = carteDuNiveau.getObjectLayer("departPlatforme");
     if (tab_points) {
       this.groupe_plateformes = this.physics.add.group({ allowGravity: false, immovable: true });
@@ -117,44 +120,35 @@ export default class piece1 extends Phaser.Scene {
           else p.setVelocityX(80);
         }
       });
-
       this.physics.add.collider(this.player, this.groupe_plateformes);
     }
 
-    // --- CONFIGURATION DES RAIES ---
+    // RAIES
     const pointsRaies = carteDuNiveau.getObjectLayer("calque_raie");
     this.groupe_raies = this.physics.add.group({ allowGravity: false, immovable: true });
-
     if (pointsRaies) {
       pointsRaies.objects.forEach(obj => {
         let raie = this.groupe_raies.create(obj.x, obj.y, "raie_frame1");
-        raie.setScale(0.2); 
-        raie.play('nager_raie');
-        raie.setFlipX(true); 
-        raie.setVelocityX(-120); 
+        raie.setScale(0.2).play('nager_raie').setFlipX(true).setVelocityX(-120);
       });
     }
-
-    this.physics.add.overlap(this.player, this.groupe_raies, (joueur, raie) => {
-      this.mort(joueur);
-    }, null, this);
-
+    this.physics.add.overlap(this.player, this.groupe_raies, (joueur, raie) => { this.mort(joueur); }, null, this);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
   }
 
   update() {
     if (!this.clavier || !this.player || this.player.isDead) return;
 
-    // --- MODIF : CHANGEMENT DE GRAVITÉ MANUEL ---
+    // Changement de gravité manuel
     if (this.clavier.down.isDown) {
-      this.player.body.setGravityY(-1000); // Inverse la gravité
-      this.player.setFlipY(true);          // Bob a la tête en bas
+      this.player.body.setGravityY(-1000);
+      this.player.setFlipY(true);
     } else if (this.clavier.up.isDown) {
-      this.player.body.setGravityY(300);   // Gravité normale
-      this.player.setFlipY(false);         // Bob est à l'endroit
+      this.player.body.setGravityY(300);
+      this.player.setFlipY(false);
     }
 
-    // Déplacement latéral
+    // Déplacement
     if (this.clavier.left.isDown) {
       this.player.setVelocityX(-160);
       this.player.anims.play('left', true);
@@ -166,16 +160,16 @@ export default class piece1 extends Phaser.Scene {
       this.player.anims.play('turn');
     }
 
-    // --- MODIF : GESTION DU SAUT AVEC ESPACE ---
+    // Saut
     if (Phaser.Input.Keyboard.JustDown(this.toucheEspace)) {
       if (this.player.body.blocked.down || this.player.body.touching.down) {
-        this.player.setVelocityY(-350); // Saut normal
+        this.player.setVelocityY(-350);
       } else if (this.player.body.blocked.up || this.player.body.touching.up) {
-        this.player.setVelocityY(350);  // Saut quand on est au plafond
+        this.player.setVelocityY(350);
       }
     }
 
-    // Mise à jour des plateformes (Conservée)
+    // Plateformes mobiles
     if (this.groupe_plateformes) {
       this.groupe_plateformes.children.iterate((p) => {
         if (!p.isPlafond) {
@@ -195,24 +189,18 @@ export default class piece1 extends Phaser.Scene {
       });
     }
 
-    // Mise à jour des raies
+    // Raies
     if (this.groupe_raies) {
       this.groupe_raies.children.iterate((raie) => {
         raie.setFlipX(raie.body.velocity.x < 0);
-        if (raie.x < -100) {
-          raie.x = this.physics.world.bounds.width + 100;
-        } else if (raie.x > this.physics.world.bounds.width + 100) {
-          raie.x = -100;
-        }
+        if (raie.x < -100) raie.x = this.physics.world.bounds.width + 100;
+        else if (raie.x > this.physics.world.bounds.width + 100) raie.x = -100;
       });
     }
   }
 
   passerPorte(p, porte) {
-    if (!p.isDead) {
-      p.setVelocity(0, 0);
-      this.scene.start("piece2");
-    }
+    if (!p.isDead) this.scene.start("piece2");
   }
 
   mort(p) {

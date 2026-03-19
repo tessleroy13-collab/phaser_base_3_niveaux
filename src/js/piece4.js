@@ -59,7 +59,7 @@ export default class piece4 extends Phaser.Scene {
     player.setCollideWorldBounds(true); // Empêche le perso de sortir de la map
     player.setDepth(10); // Pour qu'il passe devant le décor
 
-    // --- CREATION DES ANIMATIONS (si elles n'existent pas déjà) ---
+    // --- CREATION DES ANIMATIONS ---
     if (!this.anims.exists("anim_tourne_gauche")) {
       this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 1, end: 3 }), frameRate: 10, repeat: -1 });
     }
@@ -92,10 +92,11 @@ export default class piece4 extends Phaser.Scene {
           var un_ennemi = groupe_ennemis.create(point.x, point.y - 10, "img_ennemi");
           un_ennemi.setScale(0.2);
           un_ennemi.pointsVie = 1;
-          un_ennemi.setCollideWorldBounds(true);
+          un_ennemi.setCollideWorldBounds(true); //je l'empêche de sortir des limites du monde (les bords de la map)
           un_ennemi.direction = "gauche";
           un_ennemi.setVelocityX(-40); // Ils commencent en marchant vers la gauche
-          un_ennemi.play("ennemi_gauche", true);
+          un_ennemi.play("ennemi_gauche", true); //je lance l'animation de marche vers la gauche
+          // Le "true" signifie : "ne redémarre pas l'anim si elle est déjà en cours"
         }
       });
     }

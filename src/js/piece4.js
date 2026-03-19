@@ -21,17 +21,20 @@ export default class piece4 extends Phaser.Scene {
   }
 
   create() {
-    this.isRestarting = false; 
+    this.isRestarting = false;
+    this.isVideoPlaying = false; 
+
     const carte = this.make.tilemap({ key: "map" });
     const tileset_fond = carte.addTilesetImage("fond", "fond");
     const tileset_plateformes = carte.addTilesetImage("claque_plateformes", "deco");
-    const calque_fond = carte.createLayer("Calque_de_Tuiles2", tileset_fond);
     
+    const calque_fond = carte.createLayer("Calque_de_Tuiles2", tileset_fond);
     calque_plateformes = carte.createLayer("calque_plateformes", tileset_plateformes);
     calque_plateformes.setCollisionByProperty({ estSolide: true });
-  
-    // --- CORRECTION PORTE DÉBUT (Utilise le bon nom "img_porte") ---
+
+    // Portes
     this.porte_retour = this.physics.add.staticSprite(35, 100, "img_porte").setScale(0.4).refreshBody();
+    this.porte_devant = this.physics.add.staticSprite(3155, 380, "img_portefin").setScale(0.6).refreshBody();
 
     // Personnage Bob
     player = this.physics.add.sprite(80, 100, "img_perso");
@@ -42,28 +45,25 @@ export default class piece4 extends Phaser.Scene {
     player.setCollideWorldBounds(true);
     player.setDepth(10);
 
-    // --- (Tes animations Bob et Ennemis restent ici, ne change rien) ---
+    // Animations
     if (!this.anims.exists("anim_tourne_gauche")) {
-        this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 1, end: 3 }), frameRate: 10, repeat: -1 });
+      this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 1, end: 3 }), frameRate: 10, repeat: -1 });
     }
     if (!this.anims.exists("anim_face")) {
-        this.anims.create({ key: "anim_face", frames: [{ key: "img_perso", frame: 4 }], frameRate: 20 });
+      this.anims.create({ key: "anim_face", frames: [{ key: "img_perso", frame: 4 }], frameRate: 20 });
     }
     if (!this.anims.exists("anim_tourne_droite")) {
-        this.anims.create({ key: "anim_tourne_droite", frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
+      this.anims.create({ key: "anim_tourne_droite", frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
     }
     if (!this.anims.exists("ennemi_gauche")) {
-        this.anims.create({ key: "ennemi_gauche", frames: this.anims.generateFrameNumbers("img_ennemi", { start: 8, end: 10 }), frameRate: 10, repeat: -1 });
+      this.anims.create({ key: "ennemi_gauche", frames: this.anims.generateFrameNumbers("img_ennemi", { start: 8, end: 10 }), frameRate: 10, repeat: -1 });
     }
     if (!this.anims.exists("ennemi_droite")) {
-        this.anims.create({ key: "ennemi_droite", frames: this.anims.generateFrameNumbers("img_ennemi", { start: 2, end: 4 }), frameRate: 10, repeat: -1 });
+      this.anims.create({ key: "ennemi_droite", frames: this.anims.generateFrameNumbers("img_ennemi", { start: 2, end: 4 }), frameRate: 10, repeat: -1 });
     }
 
     clavier = this.input.keyboard.createCursorKeys();
     boutonFeu = this.input.keyboard.addKey('A');
-
-    // --- CORRECTION PORTE FIN (On ne la crée qu'UNE SEULE FOIS ici) ---
-    this.porte_devant = this.physics.add.staticSprite(3155, 380, "img_portefin").setScale(0.6).refreshBody();
 
     groupeBullets = this.physics.add.group();
     groupe_ennemis = this.physics.add.group();
@@ -86,65 +86,28 @@ export default class piece4 extends Phaser.Scene {
     // Collisions
     this.physics.add.collider(player, calque_plateformes);
     this.physics.add.collider(groupe_ennemis, calque_plateformes);
-    this.physics.add.collider(groupeBullets, calque_plateformes, (bullet) => {
-    bullet.destroy(); // La balle disparait si elle touche un mur/solide
-}, null, this);
+    this.physics.add.collider(groupeBullets, calque_plateformes, (bullet) => { bullet.destroy(); });
     this.physics.add.overlap(groupeBullets, groupe_ennemis, hit, null, this);
     this.physics.add.overlap(player, groupe_ennemis, contactEnnemi, null, this);
 
     scoreText = this.add.text(16, 16, 'Cibles : 0 / ' + totalEnnemis, { fontSize: '32px', fill: '#000' });
-    scoreText.setScrollFactor(0); // Pour que le texte suive la caméra
+    scoreText.setScrollFactor(0);
 
     this.physics.world.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
     this.cameras.main.startFollow(player, true, 0.08, 0.08);
     this.cameras.main.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
-
-    // Ajoute un texte pour les messages d'erreur (invisible au début)
-    messageTexte = this.add.text(400, 300, '', { fontSize: '20px', fill: '#ff0000', backgroundColor: '#000' });
-    messageTexte.setOrigin(0.5);
-    messageTexte.setScrollFactor(0);
-    messageTexte.setVisible(false);
   }
 
   update() {
-    // Nettoyage des balles qui sortent des limites de la map
-    groupeBullets.children.each(function(b) {
-        if (b.active && (b.x < 0 || b.x > this.physics.world.bounds.width)) {
-            b.destroy();
-        }
-    }, this);
+    if (this.isRestarting || this.isVideoPlaying) return;
 
-    if (this.isRestarting) return;
-
-    // Mort par la chute
+    // Mort par chute
     if (player.y > (this.physics.world.bounds.height - 20) || player.y > 580) {
-    this.isRestarting = true;
-    player.setTint(0xff0000); // Bob devient ENFIN rouge
-    player.setVelocity(0, 0);
-    player.body.allowGravity = false;
-    
-    // On peut aussi arrêter les animations
-    player.anims.stop();
+      this.mortPersonnage();
+      return;
+    }
 
-    this.tweens.add({
-        targets: player,
-        x: player.x + 4,
-        duration: 40,
-        yoyo: true,
-        repeat: -1
-    });
-
-    this.time.addEvent({
-        delay: 2000,
-        callback: () => {
-            this.isRestarting = false;
-            this.scene.restart();
-        }
-    });
-    return;
-}
-
-    // Déplacements Bob
+    // Déplacements
     if (clavier.left.isDown) {
       player.direction = 'left';
       player.setVelocityX(-160);
@@ -167,102 +130,90 @@ export default class piece4 extends Phaser.Scene {
       tirer(player);
     }
 
-    // Intelligence Artificielle Ennemis
-    groupe_ennemis.children.iterate(function(un_ennemi) {
-        if (!un_ennemi) return;
-        if (un_ennemi.body.blocked.down) {
-            let coords = (un_ennemi.direction === "gauche") ? un_ennemi.getBottomLeft() : un_ennemi.getBottomRight();
-            let tuileSuivante = calque_plateformes.getTileAtWorldXY(coords.x, coords.y + 10);
-            
-            if (tuileSuivante == null || un_ennemi.body.blocked.left || un_ennemi.body.blocked.right) {
-                un_ennemi.direction = (un_ennemi.direction === "gauche") ? "droite" : "gauche";
-                un_ennemi.setVelocityX(un_ennemi.direction === "droite" ? 40 : -40);
-                un_ennemi.play("ennemi_" + un_ennemi.direction, true);
-            }
+    // IA Ennemis
+    groupe_ennemis.children.iterate(function (un_ennemi) {
+      if (!un_ennemi) return;
+      if (un_ennemi.body.blocked.down) {
+        let coords = (un_ennemi.direction === "gauche") ? un_ennemi.getBottomLeft() : un_ennemi.getBottomRight();
+        let tuileSuivante = calque_plateformes.getTileAtWorldXY(coords.x, coords.y + 10);
+        if (tuileSuivante == null || un_ennemi.body.blocked.left || un_ennemi.body.blocked.right) {
+          un_ennemi.direction = (un_ennemi.direction === "gauche") ? "droite" : "gauche";
+          un_ennemi.setVelocityX(un_ennemi.direction === "droite" ? 40 : -40);
+          un_ennemi.play("ennemi_" + un_ennemi.direction, true);
         }
+      }
     });
-  
+
+    // Interaction Portes
     if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
-        if (this.physics.overlap(player, this.porte_devant)) {
-            this.scene.start("fin"); 
-        }
-        if (this.physics.overlap(player, this.porte_retour)) {
-            this.scene.start("selection");
-        }
+      if (this.physics.overlap(player, this.porte_devant)) {
+        this.afficherVideoFin(); 
+      }
+      if (this.physics.overlap(player, this.porte_retour)) {
+        this.scene.start("selection");
+      }
     }
   }
-} // <--- FIN DE LA CLASSE PIECE4
 
-/**************** VARIABLES GLOBALES ****************/
-var player;
-var clavier;
-var boutonFeu;
-var groupeBullets;
-var score = 0;
-var scoreText;
-var calque_plateformes;
-var groupe_ennemis;
-var ennemisTues = 0;
-var totalEnnemis = 8;
-var messageTexte;
+  afficherVideoFin() {
+    const videoContainer = document.getElementById('video-fin-container');
+    const maVideo = document.getElementById('maVideo');
+    const gameCanvas = this.sys.game.canvas;
+
+    if (videoContainer && maVideo) {
+        this.isVideoPlaying = true;
+        this.physics.pause(); 
+
+        if (gameCanvas) gameCanvas.style.display = 'none'; 
+        videoContainer.style.display = 'flex'; 
+
+        // --- SÉCURITÉ BOUCLE ---
+        maVideo.loop = true; 
+
+        maVideo.play().catch(error => {
+            console.error("Erreur lecture vidéo : ", error);
+        });
+        
+        // Pas de redirection automatique ici pour laisser boucler.
+    } else {
+        console.error("Éléments vidéo introuvables dans l'index.html");
+    }
+  }
+
+  mortPersonnage() {
+    this.isRestarting = true;
+    player.setTint(0xff0000);
+    player.setVelocity(0, 0);
+    player.body.allowGravity = false;
+    player.anims.stop();
+    this.tweens.add({ targets: player, x: player.x + 4, duration: 40, yoyo: true, repeat: -1 });
+    this.time.addEvent({ delay: 2000, callback: () => { this.isRestarting = false; this.scene.restart(); } });
+  }
+}
+
+// Variables Globales
+var player, clavier, boutonFeu, groupeBullets, score = 0, scoreText, calque_plateformes, groupe_ennemis, totalEnnemis = 8;
 
 function tirer(player) {
   var coefDir = (player.direction == 'left') ? -1 : 1;
   var bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
-  
-  bullet.setCollideWorldBounds(false); 
-  
-  // On remplace le bug par cette propriété simple :
-  bullet.outOfBoundsKill = true; 
-  bullet.checkWorldBounds = true;
-
   bullet.body.allowGravity = false;
-  bullet.setVelocity(200 * coefDir, 0); // Vitesse modérée (2000 c'était une téléportation !)
+  bullet.setVelocity(200 * coefDir, 0);
   bullet.setScale(0.07);
 }
 
 function hit(bullet, ennemi) {
-  // On vérifie que la balle existe encore avant de la détruire
   if (bullet) bullet.destroy();
-  
   ennemi.pointsVie--;
   if (ennemi.pointsVie <= 0) {
     ennemi.destroy();
     score += 10;
-    scoreText.setText('Score: ' + score);
+    scoreText.setText('Cibles : ' + (score/10) + ' / ' + totalEnnemis);
   }
 }
 
 function contactEnnemi(player, ennemi) {
-  // Si Bob n'est pas déjà en train de mourir
   if (this.isRestarting === false) {
-    this.isRestarting = true;
-
-    // Bob s'arrête et devient rouge
-    player.setVelocity(0, 0);
-    player.setTint(0xff0000);
-    player.anims.stop();
-    
-    // On peut aussi faire reculer un peu Bob pour l'effet de choc
-    player.setVelocityY(-150);
-
-    this.tweens.add({
-        targets: player,
-        x: player.x + 4,
-        duration: 40,
-        yoyo: true,
-        repeat: -1
-    });
-
-    // On attend 2 secondes avant de recommencer
-    this.time.addEvent({
-      delay: 2000,
-      callback: () => {
-        this.isRestarting = false;
-        this.scene.restart();
-      },
-      loop: false
-    });
+    this.mortPersonnage();
   }
 }
-

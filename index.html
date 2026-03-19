@@ -1,12 +1,58 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="fr">
+<head>
     <title>Mon premier jeu en Phaser 3</title>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
-  </head>
+    <style>
+        body { 
+            margin: 0; 
+            background-color: #000; 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
 
-  <body>
+        /* Conteneur de la vidéo de fin */
+        #video-fin-container {
+            display: none; 
+            text-align: center; 
+            background: black; 
+            width: 100vw; 
+            height: 100vh; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: 999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-family: sans-serif;
+        }
+
+        video {
+            width: 80%;
+            max-width: 800px;
+            border: 5px solid #34495e;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="video-fin-container">
+        <h1 style="margin-bottom: 20px;">Félicitations !</h1>
+        <video id="maVideo" loop playsinline>
+            <source src="src/assets/videofin.mp4" type="video/mp4">
+            Votre navigateur ne supporte pas la vidéo.
+        </video>
+        <p style="margin-top: 20px;">Appuyez sur <strong>F5</strong> pour recommencer l'aventure</p>
+    </div>
+
     <script src="src/js/index.js" type="module"></script>
-  </body>
+</body>
 </html>

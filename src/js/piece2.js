@@ -27,7 +27,7 @@ export default class piece2 extends Phaser.Scene {
         // 1. LE FOND
         this.fondRoule = this.add.tileSprite(400, 300, 800, 600, "FondFINI_image").setDepth(-1);
 
-        // 2. LA PORTE DE DÉPART (Réduite à 0.05)
+        // 2. LA PORTE DE DÉPART
         this.porte2 = this.add.image(180, 300, "porte2").setScale(0.05).setDepth(1);
 
         // 3. LE JOUEUR (BOB)
@@ -42,6 +42,8 @@ export default class piece2 extends Phaser.Scene {
         }
         this.player.play("bob_vol");
         this.player.setScale(this.bobScale).setDepth(10);
+        
+        // Hitbox de Bob optimisée
         this.player.body.setSize(160, 260, true);
         this.player.body.allowGravity = false;
 
@@ -50,21 +52,18 @@ export default class piece2 extends Phaser.Scene {
         this.bonus = this.physics.add.group();
         this.clavier = this.input.keyboard.createCursorKeys();
         this.toucheEspace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-       
+        
+        // Style du score harmonisé
         this.scoreText = this.add.text(16, 16, `Patricks: 0/${this.totalPatricksVoulus}`, {
-            fontSize: '24px', fill: '#fff', stroke: '#000', strokeThickness: 3
+            fontSize: '24px', 
+            fill: '#fff', 
+            backgroundColor: '#000000aa', 
+            padding: { x: 10, y: 5 }
         }).setDepth(20);
 
         if (!this.dejaJoue) {
             this.scoreText.setVisible(false);
-            this.annonceRegles = this.add.text(400, 300,
-                "RÈGLES DU JEU :\n\nAttrape 7 Patricks\nsans toucher les cailloux !\n\n--- Appuie sur ESPACE pour commencer ---",
-                {
-                    fontSize: '28px', fill: '#fff', align: 'center',
-                    backgroundColor: '#000000aa', padding: { x: 20, y: 20 },
-                    stroke: '#000', strokeThickness: 5
-                }
-            ).setOrigin(0.5).setDepth(30);
+            this.afficherRegles(); 
         } else {
             this.demarrerLeJeu();
         }
@@ -74,8 +73,27 @@ export default class piece2 extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.bonus, this.collecterPatrick, null, this);
     }
 
+    afficherRegles() {
+        this.groupeRegles = this.add.container(0, 0).setScrollFactor(0).setDepth(200);
+        
+        let fond = this.add.graphics();
+        fond.fillStyle(0x000000, 0.8);
+        fond.fillRect(200, 150, 400, 300);
+        
+        let texte = this.add.text(400, 300, 
+            "RÈGLES DU JEU :\n\nAttrape 7 Patricks parmi tous ceux\nqui apparaissent sans toucher les cailloux !\n\n--- Appuie sur ESPACE pour commencer ---",
+            { 
+                fontSize: '18px', 
+                fill: '#fff', 
+                align: 'center', 
+                wordWrap: { width: 350 } 
+            }
+        ).setOrigin(0.5);
+
+        this.groupeRegles.add([fond, texte]);
+    }
+
     update() {
-        // SI MORT : Tout s'arrête (Le fond et les touches ne répondent plus)
         if (this.estMort) return;
 
         if (!this.jeuACommence) {
@@ -104,7 +122,7 @@ export default class piece2 extends Phaser.Scene {
 
     demarrerLeJeu() {
         this.jeuACommence = true;
-        if (this.annonceRegles) this.annonceRegles.destroy();
+        if (this.groupeRegles) this.groupeRegles.destroy();
         this.scoreText.setVisible(true);
 
         this.timerPierres = this.time.addEvent({
@@ -118,8 +136,18 @@ export default class piece2 extends Phaser.Scene {
     spawnObstacles() {
         if (this.victoire || this.estMort) return;
         let py = Phaser.Math.Between(150, 450);
-        this.obstacles.create(900, py - 260, "pierre1").setVelocityX(-350).body.allowGravity = false;
-        this.obstacles.create(900, py + 260, "pierre2").setVelocityX(-350).body.allowGravity = false;
+        
+        // AJUSTEMENT : Hitbox augmentée à 85% pour encadrer parfaitement le caillou
+        let p1 = this.obstacles.create(900, py - 260, "pierre1");
+        p1.setVelocityX(-350);
+        p1.body.allowGravity = false;
+        p1.body.setSize(p1.width * 0.85, p1.height * 0.85, true);
+
+        // AJUSTEMENT : Hitbox augmentée à 85% pour encadrer parfaitement le caillou
+        let p2 = this.obstacles.create(900, py + 260, "pierre2");
+        p2.setVelocityX(-350);
+        p2.body.allowGravity = false;
+        p2.body.setSize(p2.width * 0.85, p2.height * 0.85, true);
     }
 
     spawnPatrick() {
@@ -133,12 +161,12 @@ export default class piece2 extends Phaser.Scene {
         patrick.destroy();
         this.patrickAttrapes++;
         this.scoreText.setText(`Patricks: ${this.patrickAttrapes}/${this.totalPatricksVoulus}`);
-       
+        
         if (this.bobScale > 0.12) {
             this.bobScale -= 0.02;
             this.player.setScale(this.bobScale);
         }
-       
+        
         if (this.patrickAttrapes >= this.totalPatricksVoulus) {
             this.nettoyageEtApparitionPorte();
         }
@@ -148,7 +176,7 @@ export default class piece2 extends Phaser.Scene {
         this.victoire = true;
         if(this.timerPierres) this.timerPierres.remove();
         if(this.timerPatricks) this.timerPatricks.remove();
-       
+        
         this.bonus.clear(true, true);
         this.obstacles.clear(true, true);
 
@@ -156,7 +184,7 @@ export default class piece2 extends Phaser.Scene {
         this.porte2bis.setScale(0.5).setDepth(1); 
         this.porte2bis.body.allowGravity = false;
         this.porte2bis.body.setImmovable(true);
-       
+        
         this.physics.add.overlap(this.player, this.porte2bis, () => {
             this.aspirationVersPiece3();
         }, null, this);
@@ -185,24 +213,16 @@ export default class piece2 extends Phaser.Scene {
     mortDeBob() {
         if (this.estMort || this.victoire) return;
         this.estMort = true;
-
-        // 1. FIGER LE MONDE
         if(this.timerPierres) this.timerPierres.remove();
         if(this.timerPatricks) this.timerPatricks.remove();
         
-        // Arrêter tous les objets qui bougeaient déjà
         this.obstacles.setVelocityX(0);
         this.bonus.setVelocityX(0);
-
-        // 2. BOB DEVIENT ROUGE ET TOMBE
+        
         this.player.setTint(0xff0000); 
-        this.player.stop(); // Arrête l'animation de vol
-        
-        // On active la gravité juste pour lui au moment de sa mort
+        this.player.stop(); 
         this.player.body.setAllowGravity(true);
-        this.player.setVelocity(0, 600); // Impulsion vers le bas
-        
-        // On désactive ses collisions pour qu'il traverse les cailloux en tombant
+        this.player.setVelocity(0, 600); 
         this.player.body.checkCollision.none = true;
 
         this.time.delayedCall(2000, () => {

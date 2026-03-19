@@ -96,10 +96,61 @@ export default class piece4 extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
     this.cameras.main.startFollow(player, true, 0.08, 0.08);
     this.cameras.main.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
+
+    // --- SYSTÈME DE DÉPART (PAUSE + CONSIGNES) ---
+
+this.physics.pause();
+this.isPausedAtStart = true;
+
+// Création du rectangle de fond
+let fondConsignes = this.add.rectangle(
+    this.cameras.main.centerX, 
+    this.cameras.main.centerY, 
+    600, 300, 0x000000, 0.8
+).setOrigin(0.5).setDepth(100).setScrollFactor(0).setStrokeStyle(4, 0xff00a2);
+
+// Texte des consignes (On change la dernière ligne du texte)
+let texteConsignes = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 20, 
+    "MISSION :\nÉlimine les " + totalEnnemis + " ennemis pour sortir !\n\n[A] pour tirer\n[Flèches] pour bouger\n\n-- APPUIE SUR [ENTRÉE] POUR COMMENCER --", 
+    { 
+        fontSize: '22px', 
+        fill: '#ffffff', 
+        align: 'center',
+        fontStyle: 'bold',
+        wordWrap: { width: 550 }
+    }
+).setOrigin(0.5).setDepth(101).setScrollFactor(0);
+
+// --- NOUVEAU : Écouteur de touche Entrée ---
+this.toucheEntree = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+
+// On crée une fonction réutilisable pour fermer le menu
+const demarrerJeu = () => {
+    if (!this.isPausedAtStart) return; // Sécurité pour ne le faire qu'une fois
+    
+    this.physics.resume();
+    this.isPausedAtStart = false;
+    
+    this.tweens.add({
+        targets: [fondConsignes, texteConsignes],
+        alpha: 0,
+        duration: 500,
+        onComplete: () => {
+            fondConsignes.destroy();
+            texteConsignes.destroy();
+        }
+    });
+};
+
+// On déclenche le démarrage si on appuie sur Entrée
+this.toucheEntree.on('down', demarrerJeu);
   }
 
   update() {
     if (this.isRestarting || this.isVideoPlaying) return;
+
+    // On ajoute 'this.isPausedAtStart' à la liste des blocages
+    if (this.isRestarting || this.isVideoPlaying || this.isPausedAtStart) return;
 
     // Mort par chute
     if (player.y > (this.physics.world.bounds.height - 20) || player.y > 580) {
@@ -145,10 +196,35 @@ export default class piece4 extends Phaser.Scene {
     });
 
     // Interaction Portes
-    if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
+   if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
+      // 1. PORTE DE FIN
       if (this.physics.overlap(player, this.porte_devant)) {
-        this.afficherVideoFin(); 
+        if (score >= totalEnnemis) {
+          this.afficherVideoFin(); 
+        } else {
+          // Affichage du message d'erreur BIEN VISIBLE au centre
+          let reste = totalEnnemis - score;
+          let msg = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 
+            "MISSION INCOMPLÈTE\nIl te reste " + reste + " ennemi(s) !", 
+            { 
+              fontSize: '28px', 
+              fill: '#ff00a2', 
+              backgroundColor: '#000000',
+              padding: { x: 20, y: 10 },
+              align: 'center',
+              fontStyle: 'bold'
+            }
+          ).setOrigin(0.5).setDepth(100).setScrollFactor(0);
+
+          // Le message disparaît après 3.5 secondes
+          this.time.addEvent({
+            delay: 3500,
+            callback: () => { msg.destroy(); }
+          });
+        }
       }
+
+      // 2. PORTE DE RETOUR
       if (this.physics.overlap(player, this.porte_retour)) {
         this.scene.start("selection");
       }
@@ -198,7 +274,7 @@ function tirer(player) {
   var coefDir = (player.direction == 'left') ? -1 : 1;
   var bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
   bullet.body.allowGravity = false;
-  bullet.setVelocity(200 * coefDir, 0);
+  bullet.setVelocity(250 * coefDir, 0);
   bullet.setScale(0.07);
 }
 
@@ -207,8 +283,8 @@ function hit(bullet, ennemi) {
   ennemi.pointsVie--;
   if (ennemi.pointsVie <= 0) {
     ennemi.destroy();
-    score += 10;
-    scoreText.setText('Cibles : ' + (score/10) + ' / ' + totalEnnemis);
+    score += 1;
+    scoreText.setText('Cibles : ' + score + ' / ' + totalEnnemis);
   }
 }
 

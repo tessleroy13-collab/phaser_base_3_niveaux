@@ -145,10 +145,35 @@ export default class piece4 extends Phaser.Scene {
     });
 
     // Interaction Portes
-    if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
+   if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
+      // 1. PORTE DE FIN
       if (this.physics.overlap(player, this.porte_devant)) {
-        this.afficherVideoFin(); 
+        if (score >= totalEnnemis) {
+          this.afficherVideoFin(); 
+        } else {
+          // Affichage du message d'erreur BIEN VISIBLE au centre
+          let reste = totalEnnemis - score;
+          let msg = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 
+            "MISSION INCOMPLÈTE\nIl te reste " + reste + " cible(s) !", 
+            { 
+              fontSize: '28px', 
+              fill: '#ff00a2', 
+              backgroundColor: '#000000',
+              padding: { x: 20, y: 10 },
+              align: 'center',
+              fontStyle: 'bold'
+            }
+          ).setOrigin(0.5).setDepth(100).setScrollFactor(0);
+
+          // Le message disparaît après 2.5 secondes
+          this.time.addEvent({
+            delay: 2500,
+            callback: () => { msg.destroy(); }
+          });
+        }
       }
+
+      // 2. PORTE DE RETOUR
       if (this.physics.overlap(player, this.porte_retour)) {
         this.scene.start("selection");
       }
@@ -198,7 +223,7 @@ function tirer(player) {
   var coefDir = (player.direction == 'left') ? -1 : 1;
   var bullet = groupeBullets.create(player.x + (25 * coefDir), player.y - 4, 'bullet');
   bullet.body.allowGravity = false;
-  bullet.setVelocity(200 * coefDir, 0);
+  bullet.setVelocity(250 * coefDir, 0);
   bullet.setScale(0.07);
 }
 
@@ -207,8 +232,8 @@ function hit(bullet, ennemi) {
   ennemi.pointsVie--;
   if (ennemi.pointsVie <= 0) {
     ennemi.destroy();
-    score += 10;
-    scoreText.setText('Cibles : ' + (score/10) + ' / ' + totalEnnemis);
+    score += 1;
+    scoreText.setText('Cibles : ' + score + ' / ' + totalEnnemis);
   }
 }
 

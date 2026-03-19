@@ -99,51 +99,58 @@ export default class piece4 extends Phaser.Scene {
 
     // --- SYSTÈME DE DÉPART (PAUSE + CONSIGNES) ---
 
-this.physics.pause();
-this.isPausedAtStart = true;
+// On vérifie si c'est la toute première fois qu'on charge la scène
+if (premierLancement) {
+    this.physics.pause();
+    this.isPausedAtStart = true;
 
-// Création du rectangle de fond
-let fondConsignes = this.add.rectangle(
-    this.cameras.main.centerX, 
-    this.cameras.main.centerY, 
-    600, 300, 0x000000, 0.8
-).setOrigin(0.5).setDepth(100).setScrollFactor(0).setStrokeStyle(4, 0xff00a2);
+    // Création du rectangle de fond
+    let fondConsignes = this.add.rectangle(
+        this.cameras.main.centerX, 
+        this.cameras.main.centerY, 
+        600, 300, 0x000000, 0.8
+    ).setOrigin(0.5).setDepth(100).setScrollFactor(0).setStrokeStyle(4, 0xff00a2);
 
-// Texte des consignes (On change la dernière ligne du texte)
-let texteConsignes = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 20, 
-    "MISSION :\nÉlimine les " + totalEnnemis + " ennemis pour sortir !\n\n[A] pour tirer\n[Flèches] pour bouger\n\n-- APPUIE SUR [ENTRÉE] POUR COMMENCER --", 
-    { 
-        fontSize: '22px', 
-        fill: '#ffffff', 
-        align: 'center',
-        fontStyle: 'bold',
-        wordWrap: { width: 550 }
-    }
-).setOrigin(0.5).setDepth(101).setScrollFactor(0);
-
-// --- NOUVEAU : Écouteur de touche Entrée ---
-this.toucheEntree = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-
-// On crée une fonction réutilisable pour fermer le menu
-const demarrerJeu = () => {
-    if (!this.isPausedAtStart) return; // Sécurité pour ne le faire qu'une fois
-    
-    this.physics.resume();
-    this.isPausedAtStart = false;
-    
-    this.tweens.add({
-        targets: [fondConsignes, texteConsignes],
-        alpha: 0,
-        duration: 500,
-        onComplete: () => {
-            fondConsignes.destroy();
-            texteConsignes.destroy();
+    // Texte des consignes
+    let texteConsignes = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 20, 
+        "MISSION :\nÉlimine les " + totalEnnemis + " ennemis pour sortir !\n\n[A] pour tirer\n[Flèches] pour bouger\n\n-- APPUIE SUR [ENTRÉE] POUR COMMENCER --", 
+        { 
+            fontSize: '22px', 
+            fill: '#ffffff', 
+            align: 'center',
+            fontStyle: 'bold',
+            wordWrap: { width: 550 }
         }
-    });
-};
+    ).setOrigin(0.5).setDepth(101).setScrollFactor(0);
 
-// On déclenche le démarrage si on appuie sur Entrée
-this.toucheEntree.on('down', demarrerJeu);
+    this.toucheEntree = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+
+    const demarrerJeu = () => {
+        if (!this.isPausedAtStart) return; 
+        
+        this.physics.resume();
+        this.isPausedAtStart = false;
+        premierLancement = false; // <--- TRÈS IMPORTANT : On dit que le premier lancement est terminé
+
+        this.tweens.add({
+            targets: [fondConsignes, texteConsignes],
+            alpha: 0,
+            duration: 500,
+            onComplete: () => {
+                fondConsignes.destroy();
+                texteConsignes.destroy();
+            }
+        });
+    };
+
+    this.toucheEntree.on('down', demarrerJeu);
+
+} else {
+    // Si ce n'est PAS le premier lancement (après une mort)
+    this.isPausedAtStart = false; 
+    // On s'assure que la physique n'est pas en pause
+    this.physics.resume(); 
+}
   }
 
   update() {
@@ -268,7 +275,7 @@ this.toucheEntree.on('down', demarrerJeu);
 }
 
 // Variables Globales
-var player, clavier, boutonFeu, groupeBullets, score = 0, scoreText, calque_plateformes, groupe_ennemis, totalEnnemis = 8;
+var player, clavier, boutonFeu, groupeBullets, score = 0, scoreText, calque_plateformes, groupe_ennemis, totalEnnemis = 8, premierLancement = true;
 
 function tirer(player) {
   var coefDir = (player.direction == 'left') ? -1 : 1;

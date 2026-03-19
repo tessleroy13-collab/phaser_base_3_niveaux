@@ -21,22 +21,21 @@ export default class piece4 extends Phaser.Scene {
   }
 
   create() {
+    score = 0;
     this.isRestarting = false;
-    this.isVideoPlaying = false; 
+    this.isVideoPlaying = false;
 
     const carte = this.make.tilemap({ key: "map" });
     const tileset_fond = carte.addTilesetImage("fond", "fond");
     const tileset_plateformes = carte.addTilesetImage("claque_plateformes", "deco");
-    
+
     const calque_fond = carte.createLayer("Calque_de_Tuiles2", tileset_fond);
     calque_plateformes = carte.createLayer("calque_plateformes", tileset_plateformes);
     calque_plateformes.setCollisionByProperty({ estSolide: true });
 
-    // Portes
     this.porte_retour = this.physics.add.staticSprite(35, 100, "img_porte").setScale(0.4).refreshBody();
     this.porte_devant = this.physics.add.staticSprite(3155, 380, "img_portefin").setScale(0.6).refreshBody();
 
-    // Personnage Bob
     player = this.physics.add.sprite(80, 100, "img_perso");
     player.setScale(0.2);
     player.body.setSize(60, 210);
@@ -45,7 +44,6 @@ export default class piece4 extends Phaser.Scene {
     player.setCollideWorldBounds(true);
     player.setDepth(10);
 
-    // Animations
     if (!this.anims.exists("anim_tourne_gauche")) {
       this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 1, end: 3 }), frameRate: 10, repeat: -1 });
     }
@@ -83,7 +81,6 @@ export default class piece4 extends Phaser.Scene {
       });
     }
 
-    // Collisions
     this.physics.add.collider(player, calque_plateformes);
     this.physics.add.collider(groupe_ennemis, calque_plateformes);
     this.physics.add.collider(groupeBullets, calque_plateformes, (bullet) => { bullet.destroy(); });
@@ -97,75 +94,64 @@ export default class piece4 extends Phaser.Scene {
     this.cameras.main.startFollow(player, true, 0.08, 0.08);
     this.cameras.main.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
 
-    // --- SYSTÈME DE DÉPART (PAUSE + CONSIGNES) ---
+    if (premierLancement) {
+      this.physics.pause();
+      this.isPausedAtStart = true;
 
-// On vérifie si c'est la toute première fois qu'on charge la scène
-if (premierLancement) {
-    this.physics.pause();
-    this.isPausedAtStart = true;
-
-    // Création du rectangle de fond
-    let fondConsignes = this.add.rectangle(
-        this.cameras.main.centerX, 
-        this.cameras.main.centerY, 
+      let fondConsignes = this.add.rectangle(
+        this.cameras.main.centerX,
+        this.cameras.main.centerY,
         600, 300, 0x000000, 0.8
-    ).setOrigin(0.5).setDepth(100).setScrollFactor(0).setStrokeStyle(4, 0xff00a2);
+      ).setOrigin(0.5).setDepth(100).setScrollFactor(0).setStrokeStyle(4, 0xff00a2);
 
-    // Texte des consignes
-    let texteConsignes = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 20, 
-        "MISSION :\nÉlimine les " + totalEnnemis + " ennemis pour sortir !\n\n[A] pour tirer\n[Flèches] pour bouger\n\n-- APPUIE SUR [ENTRÉE] POUR COMMENCER --", 
-        { 
-            fontSize: '22px', 
-            fill: '#ffffff', 
-            align: 'center',
-            fontStyle: 'bold',
-            wordWrap: { width: 550 }
+      let texteConsignes = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY - 20,
+        "MISSION :\nÉlimine les " + totalEnnemis + " ennemis pour sortir !\n\n[A] pour tirer\n[Flèches] pour bouger\n\n-- APPUIE SUR [ENTRÉE] POUR COMMENCER --",
+        {
+          fontSize: '22px',
+          fill: '#ffffff',
+          align: 'center',
+          fontStyle: 'bold',
+          wordWrap: { width: 550 }
         }
-    ).setOrigin(0.5).setDepth(101).setScrollFactor(0);
+      ).setOrigin(0.5).setDepth(101).setScrollFactor(0);
 
-    this.toucheEntree = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+      this.toucheEntree = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
-    const demarrerJeu = () => {
-        if (!this.isPausedAtStart) return; 
-        
+      const demarrerJeu = () => {
+        if (!this.isPausedAtStart) return;
+
         this.physics.resume();
         this.isPausedAtStart = false;
-        premierLancement = false; // <--- TRÈS IMPORTANT : On dit que le premier lancement est terminé
+        premierLancement = false;
 
         this.tweens.add({
-            targets: [fondConsignes, texteConsignes],
-            alpha: 0,
-            duration: 500,
-            onComplete: () => {
-                fondConsignes.destroy();
-                texteConsignes.destroy();
-            }
+          targets: [fondConsignes, texteConsignes],
+          alpha: 0,
+          duration: 500,
+          onComplete: () => {
+            fondConsignes.destroy();
+            texteConsignes.destroy();
+          }
         });
-    };
+      };
 
-    this.toucheEntree.on('down', demarrerJeu);
+      this.toucheEntree.on('down', demarrerJeu);
 
-} else {
-    // Si ce n'est PAS le premier lancement (après une mort)
-    this.isPausedAtStart = false; 
-    // On s'assure que la physique n'est pas en pause
-    this.physics.resume(); 
-}
+    } else {
+      this.isPausedAtStart = false;
+      this.physics.resume();
+    }
   }
 
   update() {
     if (this.isRestarting || this.isVideoPlaying) return;
 
-    // On ajoute 'this.isPausedAtStart' à la liste des blocages
     if (this.isRestarting || this.isVideoPlaying || this.isPausedAtStart) return;
 
-    // Mort par chute
     if (player.y > (this.physics.world.bounds.height - 20) || player.y > 580) {
       this.mortPersonnage();
       return;
     }
-
-    // Déplacements
     if (clavier.left.isDown) {
       player.direction = 'left';
       player.setVelocityX(-160);
@@ -179,16 +165,13 @@ if (premierLancement) {
       player.anims.stop();
       player.setFrame(player.direction === 'left' ? 1 : 6);
     }
-
     if (clavier.up.isDown && (player.body.onFloor() || player.body.touching.down)) {
       player.setVelocityY(-250);
     }
-
     if (Phaser.Input.Keyboard.JustDown(boutonFeu)) {
       tirer(player);
     }
 
-    // IA Ennemis
     groupe_ennemis.children.iterate(function (un_ennemi) {
       if (!un_ennemi) return;
       if (un_ennemi.body.blocked.down) {
@@ -202,36 +185,29 @@ if (premierLancement) {
       }
     });
 
-    // Interaction Portes
-   if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
-      // 1. PORTE DE FIN
+    if (Phaser.Input.Keyboard.JustDown(clavier.space)) {
       if (this.physics.overlap(player, this.porte_devant)) {
         if (score >= totalEnnemis) {
-          this.afficherVideoFin(); 
+          this.afficherVideoFin();
         } else {
-          // Affichage du message d'erreur BIEN VISIBLE au centre
           let reste = totalEnnemis - score;
-          let msg = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 
-            "MISSION INCOMPLÈTE\nIl te reste " + reste + " ennemi(s) !", 
-            { 
-              fontSize: '28px', 
-              fill: '#ff00a2', 
+          let msg = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY,
+            "MISSION INCOMPLÈTE\nIl te reste " + reste + " ennemi(s) !",
+            {
+              fontSize: '28px',
+              fill: '#ff00a2',
               backgroundColor: '#000000',
               padding: { x: 20, y: 10 },
               align: 'center',
               fontStyle: 'bold'
             }
           ).setOrigin(0.5).setDepth(100).setScrollFactor(0);
-
-          // Le message disparaît après 3.5 secondes
           this.time.addEvent({
             delay: 3500,
             callback: () => { msg.destroy(); }
           });
         }
       }
-
-      // 2. PORTE DE RETOUR
       if (this.physics.overlap(player, this.porte_retour)) {
         this.scene.start("selection");
       }
@@ -242,24 +218,17 @@ if (premierLancement) {
     const videoContainer = document.getElementById('video-fin-container');
     const maVideo = document.getElementById('maVideo');
     const gameCanvas = this.sys.game.canvas;
-
     if (videoContainer && maVideo) {
-        this.isVideoPlaying = true;
-        this.physics.pause(); 
-
-        if (gameCanvas) gameCanvas.style.display = 'none'; 
-        videoContainer.style.display = 'flex'; 
-
-        // --- SÉCURITÉ BOUCLE ---
-        maVideo.loop = true; 
-
-        maVideo.play().catch(error => {
-            console.error("Erreur lecture vidéo : ", error);
-        });
-        
-        // Pas de redirection automatique ici pour laisser boucler.
+      this.isVideoPlaying = true;
+      this.physics.pause();
+      if (gameCanvas) gameCanvas.style.display = 'none';
+      videoContainer.style.display = 'flex';
+      maVideo.loop = true;
+      maVideo.play().catch(error => {
+        console.error("Erreur lecture vidéo : ", error);
+      });
     } else {
-        console.error("Éléments vidéo introuvables dans l'index.html");
+      console.error("Éléments vidéo introuvables dans l'index.html");
     }
   }
 
@@ -274,7 +243,6 @@ if (premierLancement) {
   }
 }
 
-// Variables Globales
 var player, clavier, boutonFeu, groupeBullets, score = 0, scoreText, calque_plateformes, groupe_ennemis, totalEnnemis = 8, premierLancement = true;
 
 function tirer(player) {

@@ -92,11 +92,18 @@ export default class piece4 extends Phaser.Scene {
     this.physics.add.overlap(groupeBullets, groupe_ennemis, hit, null, this);
     this.physics.add.overlap(player, groupe_ennemis, contactEnnemi, null, this);
 
-    scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+    scoreText = this.add.text(16, 16, 'Cibles : 0 / ' + totalEnnemis, { fontSize: '32px', fill: '#000' });
+    scoreText.setScrollFactor(0); // Pour que le texte suive la caméra
 
     this.physics.world.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
     this.cameras.main.startFollow(player, true, 0.08, 0.08);
     this.cameras.main.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
+
+    // Ajoute un texte pour les messages d'erreur (invisible au début)
+    messageTexte = this.add.text(400, 300, '', { fontSize: '20px', fill: '#ff0000', backgroundColor: '#000' });
+    messageTexte.setOrigin(0.5);
+    messageTexte.setScrollFactor(0);
+    messageTexte.setVisible(false);
   }
 
   update() {
